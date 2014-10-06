@@ -3,11 +3,11 @@ function(test_fort_type RESULT_VAR TYPE)
     return()
   endif()
   message(STATUS "Checking whether Fortran supports type ${TYPE}")
-  set(TEST_FILE "${CMAKE_BINARY_DIR}${CMAKE_FILES_DIRECTORY}/cmake_test_${TYPE}.f90")
+  set(TEST_FILE "${CMAKE_BINARY_DIR}${CMAKE_FILES_DIRECTORY}/cmake_test_${RESULT_VAR}.f90")
   file(WRITE "${TEST_FILE}" "
-program test_${TYPE}
+program test_${RESULT_VAR}
   ${TYPE}:: iunit
-end program test_${TYPE}
+end program test_${RESULT_VAR}
 ")
   try_compile(COMPILE_RESULT "${CMAKE_BINARY_DIR}${CMAKE_FILES_DIRECTORY}" "${TEST_FILE}"
     OUTPUT_VARIABLE COMPILE_OUTPUT
