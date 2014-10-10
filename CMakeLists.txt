@@ -15,8 +15,10 @@ export(PACKAGE Bpp)
 
 # installable config
 
+set(CMFD "${PROJECT_BINARY_DIR}${CMAKE_FILES_DIRECTORY}")
 set(BPP_EXE "${CMAKE_INSTALL_PREFIX}/bin/bpp")
-configure_file(cmake/BppConfig.cmake.in "${PROJECT_BINARY_DIR}${CMAKE_FILES_DIRECTORY}/BppConfig.cmake" @ONLY)
+configure_file(cmake/BppConfig.cmake.in "${CMFD}/BppConfig.cmake" @ONLY)
+bpp_gen_config("${CMFD}/config.${CMAKE_Fortran_COMPILER_ID}.bpp.sh")
 if(WIN32 AND NOT CYGWIN)
 	set(INSTALL_CMAKE_DIR CMake)
 else()
@@ -27,13 +29,13 @@ install(PROGRAMS scripts/bpp
 )
 install(FILES
 		include/base.bpp.sh
-		include/config.bpp.sh.in
 		include/fortran.bpp.sh
+		"${CMFD}/config.${CMAKE_Fortran_COMPILER_ID}.bpp.sh"
 	DESTINATION include
 )
 install(FILES
 		cmake/Bpp.cmake
 		cmake/TestFortType.cmake
-		"${PROJECT_BINARY_DIR}${CMAKE_FILES_DIRECTORY}/BppConfig.cmake"
+		"${CMFD}/BppConfig.cmake"
 	DESTINATION "${INSTALL_CMAKE_DIR}"
 )
