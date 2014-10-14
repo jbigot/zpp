@@ -23,7 +23,6 @@ def callback_def(option, opt_str, value, parser):
     (optname, _, valval) = value.partition('=')
     parser.values.defines[optname.strip()] = valval.strip()
 
-
 parser = OptionParser(description="", version=__version__, usage='%prog [options...] <source> <destination>')
 parser.add_option('-I',
                   action='append',
@@ -47,44 +46,43 @@ if len(args) != 2:
     parser.error("Invalid number of arguments")
 
 # auto include install directory
-opts.includes.append(join(os.path.abspath(__file__), '..', 'include'))
+#opts.includes.append(join(os.path.abspath(__file__), '..', 'include'))
 
 tmpdir = mkdtemp(suffix='', prefix='bpp.tmp.')
-EOCAT='EOCAT_'+str(uuid4()).replace('-','_')
 result=1
 try:
     for incdir in reversed(opts.includes):
         for incfile in listdir(incdir):
-            if incfile[-7:] == '.bpp.sh'
-            src = abspath(join(incdir, incfile))
-            dst = join(tmpdir, basename(incfile))
-            if exists(dst):
-                unlink(dst)
-            symlink(src, dst)
+            if incfile[-7:] == '.bpp.sh':
+                src = abspath(join(incdir, incfile))
+                dst = join(tmpdir, basename(incfile))
+                if exists(dst):
+                    unlink(dst)
+                symlink(src, dst)
 
-    tmp = NamedTemporaryFile(prefix='bpp.', suffix='.tmp.bash', dir=tmpdir, delete=False)
-
-    tmp.write("#!/bin/bash\n")
-    inbash=True
-    for (var, val) in opts.defines:
-        tmp.write(var+'='+val)
-    for line in file(args[0]):
-        if line[0:4] == "!$SH":
-            if not inbash:
-                tmp.write(EOCAT+"\n")
-                inbash=True
-                tmp.write(line[4:])
-        else:
-            if inbash:
-                tmp.write("cat<<"+EOCAT+"\n")
-                inbash=False
-                tmp.write(line)
+    with open(join(tmpdir, basename(args[0])+'.sh'), 'w') as tmpfile:
+        tmpfile.write("#!/bin/bash\n")
+        inbash=True
+        for (var, val) in opts.defines:
+            tmpfile.write(var+'='+val+"\n")
+        EOCAT='EOCAT_'+str(uuid4()).replace('-','_')
+        for line in file(args[0]):
+            if line[0:4] == "!$SH":
+                if not inbash:
+                    tmpfile.write(EOCAT+"\n")
+                    inbash=True
+                tmpfile.write(line[4:])
+            else:
+                if inbash:
+                    tmpfile.write("cat<<"+EOCAT+"\n")
+                    inbash=False
+                tmpfile.write(line)
         if not inbash:
-            tmp.write(EOCAT+"\n")
-    tmp.close()
+            tmpfile.write(EOCAT+"\n")
+        tmpfile.close()
 
-    outfile=open(args[1], 'w')
-    result = call(['bash','-r',tmp.name], stdout=outfile, cwd=tmpdir)
+        outfile=open(args[1], 'w')
+        result = call(['bash','-r', basename(tmpfile.name)], stdout=outfile, cwd=tmpdir)
 except:
     result=-1
 rmtree(tmpdir)

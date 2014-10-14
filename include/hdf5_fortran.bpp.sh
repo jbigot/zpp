@@ -1,11 +1,16 @@
-HDF5TYPES="CHARACTER COMPLEX8 COMPLEX16 COMPLEX32 INTEGER1 INTEGER2 INTEGER4 INTEGER8 LOGICAL1 LOGICAL2 LOGICAL4 LOGICAL8 REAL4 REAL8 REAL16"
+source fortran.bpp.sh
 
 # Returns the HDF5 type constant associated to the one letter type descriptor $1
-function hdf5_constant {
-  H_c="H5T_NATIVE_CHARACTER"
-  H_d="H5T_NATIVE_DOUBLE"
-  H_f="H5T_NATIVE_REAL"
-  H_i="H5T_NATIVE_INTEGER"
-  eval "echo \${H_${1}}"
+hdf5_constant()
+{
+	eval "echo -n \${HDF5CST_$1}"
 }
 
+HDF5TYPES=''
+for T in ${FORTTYPES}
+do
+	if [ -n "$(hdf5_constant $T)" ]
+	then
+		HDF5TYPES="${HDF5TYPES}${T} "
+	fi
+done

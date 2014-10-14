@@ -1,31 +1,36 @@
 FORTTYPES="CHARACTER1 COMPLEX4 COMPLEX8 COMPLEX16 INTEGER1 INTEGER2 INTEGER4 INTEGER8 LOGICAL1 LOGICAL2 LOGICAL4 LOGICAL8 REAL4 REAL8 REAL16"
 
-"${CONFIG_FILE:=config.bpp.sh}"
-
 source base.bpp.sh
+CONFIG_FILE="${CONFIG_FILE:-config.bpp.sh}"
 if [ -r "${CONFIG_FILE}" ]
 then
 	source "${CONFIG_FILE}"
 fi
 
-# Returns the Fortran type associated to the type descriptor $1
-function fort_type {
-	TNAME="$(echo -n "$1"|sed 's/[^a-zA-Z_]*//g')"
-	TID="$(echo -n "$1"|sed 's/[^0-9]*//g')"
-	echo "${TNAME}(${TID})" | tr 'A-Z' 'a-z'
+# Returns the Fortran kind associated to the type descriptor $1
+function fort_kind {
+	echo -n "$1" | sed 's/[^0-9]*//g'
 }
 
-# Returns the size of the Fortran type associated to the type descriptor $1
-function fort_sizeof {
-	eval "echo \${S_${1}}"
+# Returns the Fortran type associated to the type descriptor $1
+function fort_ptype {
+	echo -n "$1" | sed 's/[^a-zA-Z_]*//g'
+}
 
-	TID="$(echo -n "$1"|sed 's/[^0-9]*//g')"
+# Returns the Fortran type associated to the type descriptor $1
+function fort_type {
+	echo -n "$(fort_ptype $1)(KIND=$(fort_kind $1))" | tr 'A-Z' 'a-z'
+}
+
+# Returns the size in bits of the Fortran type associated to the type descriptor $1
+function fort_sizeof {
+	KIND="$(fort_kind $1)"
 	case "$1" in
 	CHARACTER*|INTEGER*|LOGICAL*|REAL*)
-		echo "$TID"
+		echo -n "$((KIND*8))"
 		;;
 	COMPLEX*)
-		echo "$((2*TID))"
+		echo -n "$((2*KIND*8))"
 		;;
 	esac
 }
@@ -39,19 +44,19 @@ function array_desc() {
 function io_format {
 	case "$1" in
 	CHARACTER*)
-		echo "A30"
+		echo -n "A30"
 		;;
 	REAL*)
-		echo "E30.5"
+		echo -n "E30.5"
 		;;
 	INTEGER*)
-		echo "I30"
+		echo -n "I30"
 		;;
 	LOGICAL*)
-		echo "L30"
+		echo -n "L30"
 		;;
 	COMPLEX*)
-		echo "(E15.5,E15.5)"
+		echo -n "(E15.5,E15.5)"
 		;;
 	esac
 }
