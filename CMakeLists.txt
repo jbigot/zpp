@@ -1,6 +1,5 @@
 cmake_minimum_required(VERSION 2.8)
 project(Bpp Fortran)
-include(cmake/Bpp.cmake)
 
 
 # in tree config
@@ -13,7 +12,6 @@ configure_file(cmake/BppConfig.cmake.in "${PROJECT_BINARY_DIR}/BppConfig.cmake" 
 configure_file(cmake/Bpp.cmake "${PROJECT_BINARY_DIR}/Bpp.cmake" COPYONLY)
 configure_file(cmake/TestFortType.cmake "${PROJECT_BINARY_DIR}/TestFortType.cmake" COPYONLY)
 export(PACKAGE Bpp)
-
 
 
 # installable config
