@@ -19,7 +19,24 @@ function fort_ptype {
 
 # Returns the Fortran type associated to the type descriptor $1
 function fort_type {
-	echo -n "$(fort_ptype $1)(KIND=$(fort_kind $1))" | tr 'A-Z' 'a-z'
+	echo -n "$(fort_ptype $1)"
+	if [ -n "$(fort_kind $1)$2" ]
+	then
+		echo -n "("
+	fi
+	if [ -n "$(fort_kind $1)" ]
+	then
+		echo -n "KIND=$(fort_kind $1)"
+	fi
+	if [ -n "$(fort_kind $1)" -a -n "$2" ]
+	then
+		echo -n ","
+	fi
+	echo -n "$2"
+	if [ -n "$(fort_kind $1)$2" ]
+	then
+		echo -n ")"
+	fi
 }
 
 # Returns the size in bits of the Fortran type associated to the type descriptor $1
