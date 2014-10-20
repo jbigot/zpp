@@ -1,12 +1,16 @@
 cmake_minimum_required(VERSION 2.8)
-project(Bpp Fortran)
+# protect the project call to workaround a cmake bug
+if("${CMAKE_CURRENT_SOURCE_DIR}" STREQUAL "${CMAKE_SOURCE_DIR}")
+	project(Bpp Fortran)
+endif()
 
+include(cmake/Bpp.cmake)
 
 # in tree config
 
-set(BPP_EXE "${CMAKE_CURRENT_SOURCE_DIR}/scripts/bpp")
+set(BPP_EXE "${CMAKE_CURRENT_SOURCE_DIR}/scripts/bpp" CACHE PATH "BPP Executable")
 set(BPP_CMAKE "${CMAKE_CURRENT_SOURCE_DIR}/cmake/Bpp.cmake")
-set(BPP_DEFAULT_INCLUDES "${CMAKE_CURRENT_SOURCE_DIR}/include/")
+set(BPP_DEFAULT_INCLUDES "${CMAKE_CURRENT_SOURCE_DIR}/include/" CACHE STRING "BPP default include path")
 
 configure_file(cmake/BppConfig.cmake.in "${PROJECT_BINARY_DIR}/BppConfig.cmake" @ONLY)
 configure_file(cmake/Bpp.cmake "${PROJECT_BINARY_DIR}/Bpp.cmake" COPYONLY)

@@ -6,15 +6,15 @@ function(bpp_gen_config OUTFILE)
 		foreach(TYPESIZE 1 2 4 8 16 32 64)
 			test_fort_type("BPP_${TYPENAME}${TYPESIZE}_WORKS" "${TYPENAME}" "${TYPESIZE}")
 			if ( "BPP_${TYPENAME}${TYPESIZE}_WORKS" )
-				set(ALLTYPES "${ALLTYPES}${TYPENAME}${TYPESIZE} ")
+				set(BPP_FORTTYPES "${BPP_FORTTYPES}${TYPENAME}${TYPESIZE} ")
 			endif()
 		endforeach()
 	endforeach()
 	file(WRITE "${OUTFILE}"
-"#All types supported by the current Fortran implementation
-FORTTYPES=\"${ALLTYPES}\"
-${HDF5CSTS}
-H5ENDIAN=\"LE\"
+"# All types supported by the current Fortran implementation
+BPP_FORTTYPES=\"${BPP_FORTTYPES}\"
+# for compatibility
+FORTTYPES=\"\${BPP_FORTTYPES}\"
 ")
 endfunction()
 
