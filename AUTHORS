@@ -1,0 +1,3 @@
+Guillaume Latu historic awk based version of BPP.
+Julien Bigot current python version of BPP, cmake based buildsystem and
+              bash functions provided in the include files.
