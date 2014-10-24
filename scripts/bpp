@@ -63,8 +63,8 @@ try:
     with open(join(tmpdir, basename(args[0])+'.sh'), 'w') as tmpfile:
         tmpfile.write("#!/bin/bash\n")
         inbash=True
-        for (var, val) in opts.defines:
-            tmpfile.write(var+'='+val+"\n")
+        for var in opts.defines:
+            tmpfile.write(var+'='+opts.defines[var]+"\n")
         EOCAT='EOCAT_'+str(uuid4()).replace('-','_')
         for line in file(args[0]):
             if line[0:4] == "!$SH":
