@@ -1,4 +1,4 @@
-BPP_PATH:="../.."
+BPP_PATH:="/usr"
 BPP_COMPILER_ID:=Gnu
 
 BPP:=$(BPP_PATH)/bin/bpp
