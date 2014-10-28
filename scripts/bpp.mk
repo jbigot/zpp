@@ -1,5 +1,5 @@
 ################################################################################
-# Copyright (c) 2013-2014, CEA
+# Copyright (c) 2013-2014, Julien Bigot - CEA (julien.bigot@cea.fr)
 # All rights reserved.
 #
 # Permission is hereby granted, free of charge, to any person obtaining a copy
@@ -23,8 +23,9 @@
 
 BPP_COMPILER_ID:=Gnu
 
-BPP:=$(PWD)/bin/bpp
-BPP_DEFAULT_INCLUDES=-I $(PWD)/include
+BPP_PATH=$(abspath $(lastword $(MAKEFILE_LIST))/../..)
+BPP=$(BPP_PATH)/scripts/bpp
+BPP_DEFAULT_INCLUDES=-I $(BPP_PATH)/include
 
 %: %.bpp
 	$(BPP) $(BPP_DEFAULT_INCLUDES) -DBPP_CONFIG=config.$(BPP_COMPILER_ID) $(BPPOPTS) $< $@

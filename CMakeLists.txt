@@ -1,5 +1,5 @@
 ##############################################################################
-# Copyright (c) 2013-2014, CEA
+# Copyright (c) 2013-2014, Julien Bigot - CEA (julien.bigot@cea.fr)
 #
 # Permission is hereby granted, free of charge, to any person obtaining a copy
 # of this software and associated documentation files (the "Software"), to deal

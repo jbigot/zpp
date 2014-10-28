@@ -1,5 +1,5 @@
 ################################################################################
-# Copyright (c) 2013-2014, CEA
+# Copyright (c) 2013-2014, Julien Bigot - CEA (julien.bigot@cea.fr)
 # All rights reserved.
 #
 # Permission is hereby granted, free of charge, to any person obtaining a copy
@@ -21,7 +21,10 @@
 # THE SOFTWARE.
 ################################################################################
 
-include ../../scripts/make.include
+# adapt to your installation path
+include /usr/share/Bpp/bpp.mk
+# for in-tree (no-install) usage
+#include ~/bpp_build/bpp.mk
 
 example: example.F90
 	$(FC) -o $@ $<
