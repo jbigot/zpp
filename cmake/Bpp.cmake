@@ -44,10 +44,10 @@ endfunction()
 
 # A function to preprocess a source file with BPP
 function(bpp_preprocess OUTVAR FIRST_SRC)
-	set(BPP_INCLUDE_PARAMS)
+	set(BPP_INCLUDE_PARAMS "${BPP_DEFAULT_INCLUDES}")
 
 	get_property(INCLUDE_DIRS DIRECTORY PROPERTY INCLUDE_DIRECTORIES)
-	foreach(INCLUDE_DIR ${BPP_DEFAULT_INCLUDES} ${INCLUDE_DIRS})
+	foreach(INCLUDE_DIR ${INCLUDE_DIRS})
 		set(BPP_INCLUDE_PARAMS ${BPP_INCLUDE_PARAMS} "-I" "${INCLUDE_DIR}")
 	endforeach()
 

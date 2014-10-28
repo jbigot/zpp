@@ -21,12 +21,10 @@
 # THE SOFTWARE.
 ################################################################################
 
-include ../../scripts/make.include
+BPP_COMPILER_ID:=Gnu
 
-example: example.F90
-	$(FC) -o $@ $<
+BPP:=$(PWD)/bin/bpp
+BPP_DEFAULT_INCLUDES=-I $(PWD)/include
 
-.PHONY: clean
-
-clean:
-	$(RM) example example.F90 *.mod
+%: %.bpp
+	$(BPP) $(BPP_DEFAULT_INCLUDES) -DBPP_CONFIG=config.$(BPP_COMPILER_ID) $(BPPOPTS) $< $@

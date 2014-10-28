@@ -21,14 +21,14 @@
 # THE SOFTWARE.
 ################################################################################
 
-BPP_PATH:="../.."
-BPP_COMPILER_ID:=Gnu
-
-BPP:=$(BPP_PATH)/scripts/bpp
-BPPOPTS:=-I $(BPP_PATH)/include -DBPP_CONFIG=config.$(BPP_COMPILER_ID)
+# adapt to your installation path
+include /usr/share/Bpp/bpp.mk
+#include ~/bpp_build/bpp.mk
 
 example: example.F90
 	$(FC) -o $@ $<
 
-%: %.bpp
-	$(BPP) $(BPPOPTS) $< $@
+.PHONY: clean
+
+clean:
+	$(RM) example example.F90 *.mod

@@ -32,40 +32,38 @@ include(cmake/Bpp.cmake)
 
 set(BPP_EXE "${CMAKE_CURRENT_SOURCE_DIR}/scripts/bpp" CACHE PATH "BPP Executable")
 set(BPP_CMAKE "${CMAKE_CURRENT_SOURCE_DIR}/cmake/Bpp.cmake")
-set(BPP_DEFAULT_INCLUDES "${CMAKE_CURRENT_SOURCE_DIR}/include/" CACHE STRING "BPP default include path")
+set(BPP_DEFAULT_INCLUDES "-I ${CMAKE_CURRENT_SOURCE_DIR}/include/" CACHE STRING "BPP default include path")
 
 configure_file(cmake/BppConfig.cmake.in "${PROJECT_BINARY_DIR}/BppConfig.cmake" @ONLY)
 configure_file(cmake/Bpp.cmake "${PROJECT_BINARY_DIR}/Bpp.cmake" COPYONLY)
 configure_file(cmake/TestFortType.cmake "${PROJECT_BINARY_DIR}/TestFortType.cmake" COPYONLY)
+configure_file(scripts/bpp.mk.in "${PROJECT_BINARY_DIR}/bpp.mk" @ONLY)
 export(PACKAGE Bpp)
 
 
 # installable config
 
-if(WIN32 AND NOT CYGWIN)
-	set(INSTALL_CMAKE_DIR CMake)
-else()
-	set(INSTALL_CMAKE_DIR lib/CMake/Bpp)
-endif()
 set(WORK_DIR "${PROJECT_BINARY_DIR}${CMAKE_FILES_DIRECTORY}")
 
 set(BPP_EXE "${CMAKE_INSTALL_PREFIX}/bin/bpp")
-set(BPP_CMAKE "${CMAKE_INSTALL_PREFIX}${INSTALL_CMAKE_DIR}/Bpp.cmake")
-set(BPP_DEFAULT_INCLUDES "${CMAKE_INSTALL_PREFIX}/include/")
+set(BPP_CMAKE "${CMAKE_INSTALL_PREFIX}lib/CMake/Bpp/Bpp.cmake")
+set(BPP_DEFAULT_INCLUDES "-I ${CMAKE_INSTALL_PREFIX}/share/Bpp/include/")
 
 configure_file(cmake/BppConfig.cmake.in "${WORK_DIR}/BppConfig.cmake" @ONLY)
+configure_file(scripts/bpp.mk.in "${WORK_DIR}/bpp.mk" @ONLY)
 install(PROGRAMS scripts/bpp
 	DESTINATION bin
 )
-install(FILES
-		include/base.bpp.sh
-		include/fortran.bpp.sh
-		include/hdf5_fortran.bpp.sh
-	DESTINATION include
+install(DIRECTORY include/
+	DESTINATION share/Bpp/include/
+	FILES_MATCHING PATTERN "*.bpp.sh"
+)
+install(FILES "${WORK_DIR}/bpp.mk"
+	DESTINATION share/Bpp/
 )
 install(FILES
 		cmake/Bpp.cmake
 		cmake/TestFortType.cmake
 		"${WORK_DIR}/BppConfig.cmake"
-	DESTINATION "${INSTALL_CMAKE_DIR}"
+	DESTINATION lib/CMake/Bpp
 )
