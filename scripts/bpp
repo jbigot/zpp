@@ -24,9 +24,9 @@
 ################################################################################
 
 __author__  = 'Julien Bigot <julien.bigot@cea.fr>'
-__version__ = '0.2'
+__version__ = '@BPP_VERSION@'
 __date__    = '2013/08/01'
-__license__ = 'BSD'
+__license__ = 'MIT'
 
 """ The Bash PreProcessor
 """
