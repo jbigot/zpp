@@ -33,18 +33,21 @@ function(bpp_gen_config OUTFILE)
 			endif()
 		endforeach()
 	endforeach()
-	file(WRITE "${OUTFILE}"
+	if(NOT EXISTS "${OUTFILE}")
+		file(WRITE "${OUTFILE}"
 "# All types supported by the current Fortran implementation
 BPP_FORTTYPES=\"${BPP_FORTTYPES}\"
 # for compatibility
 FORTTYPES=\"\${BPP_FORTTYPES}\"
 ")
+	endif()
 endfunction()
+
 
 
 # A function to preprocess a source file with BPP
 function(bpp_preprocess OUTVAR FIRST_SRC)
-	set(BPP_INCLUDE_PARAMS "${BPP_DEFAULT_INCLUDES}")
+	set(BPP_INCLUDE_PARAMS ${BPP_DEFAULT_INCLUDES})
 
 	get_property(INCLUDE_DIRS DIRECTORY PROPERTY INCLUDE_DIRECTORIES)
 	foreach(INCLUDE_DIR ${INCLUDE_DIRS})
@@ -54,19 +57,24 @@ function(bpp_preprocess OUTVAR FIRST_SRC)
 	bpp_gen_config("${CMAKE_CURRENT_BINARY_DIR}/bppconf/config.bpp.sh")
 	set(BPP_INCLUDE_PARAMS ${BPP_INCLUDE_PARAMS} "-I" "${CMAKE_CURRENT_BINARY_DIR}/bppconf")
 
-	set(RESULT)
+	set(OUTFILES)
 	foreach(SRC "${FIRST_SRC}" ${ARGN})
 		get_filename_component(OUTFILE "${SRC}" NAME)
 		string(REGEX REPLACE "\\.[bB][pP][pP]$" "" OUTFILE "${OUTFILE}")
 		set(OUTFILE "${CMAKE_CURRENT_BINARY_DIR}/${OUTFILE}")
-		list(APPEND RESULT "${OUTFILE}")
 		add_custom_command(OUTPUT "${OUTFILE}"
-			COMMAND "${BPP_EXE}" ARGS ${BPP_INCLUDE_PARAMS} "${SRC}" "${OUTFILE}"
+			COMMAND "${BPP_EXE}" ${BPP_INCLUDE_PARAMS} "${SRC}" "${OUTFILE}"
 			WORKING_DIRECTORY "${CMAKE_CURRENT_SOURCE_DIR}"
 			MAIN_DEPENDENCY "${SRC}"
 			VERBATIM
 		)
+		list(APPEND OUTFILES "${OUTFILE}")
 	endforeach()
 
-	set(${OUTVAR} ${RESULT} PARENT_SCOPE)
+	string(RANDOM LENGTH 25 TARGET_NAME)
+	add_library(${TARGET_NAME}
+		OBJECT "${FIRST_SRC}" ${ARGN}
+	)
+
+	set(${OUTVAR} "$<TARGET_OBJECTS:${TARGET_NAME}>" PARENT_SCOPE)
 endfunction()

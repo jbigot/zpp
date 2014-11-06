@@ -32,22 +32,22 @@ file(READ VERSION BPP_VERSION)
 
 # in tree config
 
-set(BPP_EXE "${PROJECT_BINARY_DIR}/bpp" CACHE PATH "BPP Executable")
+set(BPP_EXE "${CMAKE_CURRENT_BINARY_DIR}/bpp" CACHE PATH "BPP Executable")
 set(BPP_CMAKE "${CMAKE_CURRENT_SOURCE_DIR}/cmake/Bpp.cmake")
-set(BPP_DEFAULT_INCLUDES "-I ${CMAKE_CURRENT_SOURCE_DIR}/include/" CACHE STRING "BPP default include path")
+set(BPP_DEFAULT_INCLUDES -I ${CMAKE_CURRENT_SOURCE_DIR}/include/ CACHE STRING "BPP default include path")
 
-configure_file(cmake/BppConfig.cmake.in "${PROJECT_BINARY_DIR}/BppConfig.cmake" @ONLY)
-configure_file(cmake/BppConfigVersion.cmake.in "${PROJECT_BINARY_DIR}/BppConfigVersion.cmake" @ONLY)
-configure_file(cmake/Bpp.cmake "${PROJECT_BINARY_DIR}/Bpp.cmake" COPYONLY)
-configure_file(cmake/TestFortType.cmake "${PROJECT_BINARY_DIR}/TestFortType.cmake" COPYONLY)
-configure_file(scripts/bpp.mk.in "${PROJECT_BINARY_DIR}/bpp.mk" @ONLY)
-configure_file(scripts/bpp "${PROJECT_BINARY_DIR}/bpp" @ONLY)
+configure_file(cmake/BppConfig.cmake.in "${CMAKE_CURRENT_BINARY_DIR}/BppConfig.cmake" @ONLY)
+configure_file(cmake/BppConfigVersion.cmake.in "${CMAKE_CURRENT_BINARY_DIR}/BppConfigVersion.cmake" @ONLY)
+configure_file(cmake/Bpp.cmake "${CMAKE_CURRENT_BINARY_DIR}/Bpp.cmake" COPYONLY)
+configure_file(cmake/TestFortType.cmake "${CMAKE_CURRENT_BINARY_DIR}/TestFortType.cmake" COPYONLY)
+configure_file(scripts/bpp.mk.in "${CMAKE_CURRENT_BINARY_DIR}/bpp.mk" @ONLY)
+configure_file(scripts/bpp "${CMAKE_CURRENT_BINARY_DIR}/bpp" @ONLY)
 export(PACKAGE Bpp)
 
 
 # installable config
 
-set(WORK_DIR "${PROJECT_BINARY_DIR}${CMAKE_FILES_DIRECTORY}")
+set(WORK_DIR "${CMAKE_CURRENT_BINARY_DIR}${CMAKE_FILES_DIRECTORY}")
 
 set(BPP_EXE "${CMAKE_INSTALL_PREFIX}/bin/bpp")
 set(BPP_CMAKE "${CMAKE_INSTALL_PREFIX}lib/CMake/Bpp/Bpp.cmake")
@@ -55,7 +55,7 @@ set(BPP_DEFAULT_INCLUDES "-I ${CMAKE_INSTALL_PREFIX}/share/Bpp/include/")
 
 configure_file(cmake/BppConfig.cmake.in "${WORK_DIR}/BppConfig.cmake" @ONLY)
 configure_file(scripts/bpp.mk.in "${WORK_DIR}/bpp.mk" @ONLY)
-install(PROGRAMS ${PROJECT_BINARY_DIR}/bpp
+install(PROGRAMS ${CMAKE_CURRENT_BINARY_DIR}/bpp
 	DESTINATION bin
 )
 install(DIRECTORY include/
@@ -69,6 +69,6 @@ install(FILES
 		cmake/Bpp.cmake
 		cmake/TestFortType.cmake
 		"${WORK_DIR}/BppConfig.cmake"
-		"${PROJECT_BINARY_DIR}/BppConfigVersion.cmake"
+		"${CMAKE_CURRENT_BINARY_DIR}/BppConfigVersion.cmake"
 	DESTINATION lib/CMake/Bpp
 )
