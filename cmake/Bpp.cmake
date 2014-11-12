@@ -73,7 +73,7 @@ function(bpp_preprocess OUTVAR FIRST_SRC)
 
 	string(RANDOM LENGTH 25 TARGET_NAME)
 	add_library(${TARGET_NAME}
-		OBJECT "${FIRST_SRC}" ${ARGN}
+		OBJECT ${OUTFILES}
 	)
 
 	set(${OUTVAR} "$<TARGET_OBJECTS:${TARGET_NAME}>" PARENT_SCOPE)
