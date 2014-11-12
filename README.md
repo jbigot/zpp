@@ -46,7 +46,6 @@ Installing Bpp is very simple.
 Inside the bpp directory, execute the following commands:
 ```
 cmake .
-make -j
 make install
 ```
 
