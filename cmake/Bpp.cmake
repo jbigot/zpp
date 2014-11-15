@@ -57,6 +57,7 @@ function(bpp_preprocess OUTVAR FIRST_SRC)
 	bpp_gen_config("${CMAKE_CURRENT_BINARY_DIR}/bppconf/config.bpp.sh")
 	set(BPP_INCLUDE_PARAMS ${BPP_INCLUDE_PARAMS} "-I" "${CMAKE_CURRENT_BINARY_DIR}/bppconf")
 
+
 	set(OUTFILES)
 	foreach(SRC "${FIRST_SRC}" ${ARGN})
 		get_filename_component(OUTFILE "${SRC}" NAME)
@@ -71,10 +72,5 @@ function(bpp_preprocess OUTVAR FIRST_SRC)
 		list(APPEND OUTFILES "${OUTFILE}")
 	endforeach()
 
-	string(RANDOM LENGTH 25 TARGET_NAME)
-	add_library(${TARGET_NAME}
-		OBJECT ${OUTFILES}
-	)
-
-	set(${OUTVAR} "$<TARGET_OBJECTS:${TARGET_NAME}>" PARENT_SCOPE)
+	set(${OUTVAR} "${OUTFILES}" PARENT_SCOPE)
 endfunction()
