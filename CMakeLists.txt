@@ -29,6 +29,7 @@ endif()
 include(cmake/Bpp.cmake)
 
 file(READ VERSION BPP_VERSION)
+string(REGEX REPLACE "\n.*" "" BPP_VERSION "${BPP_VERSION}")
 
 # in tree config
 
