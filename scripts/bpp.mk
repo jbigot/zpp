@@ -23,9 +23,18 @@
 
 BPP_COMPILER_ID:=Gnu
 
-BPP_PATH=$(abspath $(lastword $(MAKEFILE_LIST))/../..)
+BPP_PATH:=$(abspath $(lastword $(MAKEFILE_LIST))/../..)
 BPP=$(BPP_PATH)/scripts/bpp
 BPP_DEFAULT_INCLUDES=-I $(BPP_PATH)/include
 
 %: %.bpp
+	$(BPP) $(BPP_DEFAULT_INCLUDES) -DBPP_CONFIG=config.$(BPP_COMPILER_ID) $(BPPOPTS) $< $@
+
+%.F90: %.F90.bpp
+	$(BPP) $(BPP_DEFAULT_INCLUDES) -DBPP_CONFIG=config.$(BPP_COMPILER_ID) $(BPPOPTS) $< $@
+
+%.h: %.h.bpp
+	$(BPP) $(BPP_DEFAULT_INCLUDES) -DBPP_CONFIG=config.$(BPP_COMPILER_ID) $(BPPOPTS) $< $@
+
+%.inc: %.inc.bpp
 	$(BPP) $(BPP_DEFAULT_INCLUDES) -DBPP_CONFIG=config.$(BPP_COMPILER_ID) $(BPPOPTS) $< $@
