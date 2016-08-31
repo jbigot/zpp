@@ -27,7 +27,7 @@ if("${CMAKE_CURRENT_SOURCE_DIR}" STREQUAL "${CMAKE_SOURCE_DIR}")
 endif()
 
 if(POLICY CMP0054)
-cmake_policy(SET CMP0054 NEW)
+	cmake_policy(SET CMP0054 NEW)
 endif()
 
 include(cmake/Bpp.cmake)

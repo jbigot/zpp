@@ -56,7 +56,6 @@ function(bpp_preprocess)
 			AND "${BPP_PREPROCESS_INCLUDES}" STREQUAL ""
 			AND "${BPP_PREPROCESS_SOURCES}" STREQUAL ""
 	)
-		message("Old call sig")
 		list(GET ARGV 0 BPP_PREPROCESS_OUTPUT)
 		list(REMOVE_AT ARGV 0)
 		set(BPP_PREPROCESS_SOURCES ${ARGV})
