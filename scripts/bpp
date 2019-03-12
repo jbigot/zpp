@@ -94,7 +94,7 @@ try:
             tmpfile.write(var+'='+opts.defines[var]+"\n")
         EOCAT='EOCAT_'+str(uuid4()).replace('-','_')
         trigger=compile('^\s*!\$SH\s+')
-        with open(args[0]) as infile:
+        with open(args[0], 'r+', encoding='utf-8') as infile:
             for line in infile:
                 if trigger.match(line):
                     if not inbash:
