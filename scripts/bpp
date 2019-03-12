@@ -85,7 +85,7 @@ try:
                         unlink(dst)
                     symlink(src, dst)
         else:
-            print 'Warning: Nonexistent include directory "'+incdir+'"'
+            print('Warning: Nonexistent include directory "'+incdir+'"')
 
     with open(join(tmpdir, basename(args[0])+'.sh'), 'w') as tmpfile:
         tmpfile.write("#!/bin/bash\n")
@@ -113,7 +113,7 @@ try:
             result = call(['bash','-r', basename(tmpfile.name)], stdout=outfile, cwd=tmpdir)
 
 except Exception as e:
-    print e
+    print(e)
     result=-1
 
 rmtree(tmpdir)

@@ -47,7 +47,6 @@ configure_file(cmake/Bpp.cmake "${CMAKE_CURRENT_BINARY_DIR}/Bpp.cmake" COPYONLY)
 configure_file(cmake/TestFortType.cmake "${CMAKE_CURRENT_BINARY_DIR}/TestFortType.cmake" COPYONLY)
 configure_file(scripts/bpp.mk.in "${CMAKE_CURRENT_BINARY_DIR}/bpp.mk" @ONLY)
 configure_file(scripts/bpp "${CMAKE_CURRENT_BINARY_DIR}/bpp" @ONLY)
-export(PACKAGE Bpp)
 
 
 # installable config
