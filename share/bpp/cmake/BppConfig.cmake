@@ -1,5 +1,5 @@
 ################################################################################
-# Copyright (c) 2013-2014, Julien Bigot - CEA (julien.bigot@cea.fr)
+# Copyright (c) 2013-2019, Julien Bigot - CEA (julien.bigot@cea.fr)
 # All rights reserved.
 #
 # Permission is hereby granted, free of charge, to any person obtaining a copy
@@ -21,19 +21,17 @@
 # THE SOFTWARE.
 ################################################################################
 
-BPP_COMPILER_ID:=Gnu
+cmake_minimum_required(VERSION 2.8)
+cmake_policy(PUSH)
 
-BPP:=@CMAKE_INSTALL_PREFIX@/bin/bpp
-BPP_DEFAULT_INCLUDES=-I @CMAKE_INSTALL_PREFIX@/share/bpp/include/
+# Compute the installation prefix relative to this file.
+get_filename_component(_BPP_IMPORT_PREFIX "${CMAKE_CURRENT_LIST_FILE}" PATH)
+get_filename_component(_BPP_IMPORT_PREFIX "${_BPP_IMPORT_PREFIX}" PATH)
+get_filename_component(_BPP_IMPORT_PREFIX "${_BPP_IMPORT_PREFIX}" PATH)
+get_filename_component(_BPP_IMPORT_PREFIX "${_BPP_IMPORT_PREFIX}" PATH)
+if(_BPP_IMPORT_PREFIX STREQUAL "/")
+  set(_BPP_IMPORT_PREFIX "")
+endif()
+include("${_BPP_IMPORT_PREFIX}/share/bpp/cmake/Bpp.cmake")
 
-%: %.bpp
-	$(BPP) $(BPP_DEFAULT_INCLUDES) -DBPP_CONFIG=config.$(BPP_COMPILER_ID) $(BPPOPTS) $< $@
-
-%.F90: %.F90.bpp
-	$(BPP) $(BPP_DEFAULT_INCLUDES) -DBPP_CONFIG=config.$(BPP_COMPILER_ID) $(BPPOPTS) $< $@
-
-%.h: %.h.bpp
-	$(BPP) $(BPP_DEFAULT_INCLUDES) -DBPP_CONFIG=config.$(BPP_COMPILER_ID) $(BPPOPTS) $< $@
-
-%.inc: %.inc.bpp
-	$(BPP) $(BPP_DEFAULT_INCLUDES) -DBPP_CONFIG=config.$(BPP_COMPILER_ID) $(BPPOPTS) $< $@
+cmake_policy(POP)

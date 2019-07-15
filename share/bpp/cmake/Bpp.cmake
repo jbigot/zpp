@@ -1,5 +1,5 @@
 ################################################################################
-# Copyright (c) 2013-2014, Julien Bigot - CEA (julien.bigot@cea.fr)
+# Copyright (c) 2013-2019, Julien Bigot - CEA (julien.bigot@cea.fr)
 # All rights reserved.
 #
 # Permission is hereby granted, free of charge, to any person obtaining a copy
@@ -21,24 +21,27 @@
 # THE SOFTWARE.
 ################################################################################
 
-if("${CMAKE_MAJOR_VERSION}.${CMAKE_MINOR_VERSION}" LESS 2.5)
-   message(FATAL_ERROR "CMake >= 2.6.0 required")
-endif()
-
+cmake_minimum_required(VERSION 2.8)
 cmake_policy(PUSH)
-cmake_policy(VERSION 2.6)
-if("${CMAKE_VERSION}" VERSION_GREATER 2.7)
-	cmake_policy(SET CMP0012 NEW)
+
+
+# Compute the installation prefix relative to this file.
+get_filename_component(_BPP_IMPORT_PREFIX "${CMAKE_CURRENT_LIST_FILE}" PATH)
+get_filename_component(_BPP_IMPORT_PREFIX "${_BPP_IMPORT_PREFIX}" PATH)
+get_filename_component(_BPP_IMPORT_PREFIX "${_BPP_IMPORT_PREFIX}" PATH)
+get_filename_component(_BPP_IMPORT_PREFIX "${_BPP_IMPORT_PREFIX}" PATH)
+if(_BPP_IMPORT_PREFIX STREQUAL "/")
+	set(_BPP_IMPORT_PREFIX "")
 endif()
 
-include(${CMAKE_CURRENT_LIST_DIR}/TestFortType.cmake)
 
 # A function to generate the BPP config.bpp.sh file
 function(bpp_gen_config OUTFILE)
+	include("${_BPP_IMPORT_PREFIX}/share/bpp/cmake/TestFortType.cmake")
 	foreach(TYPENAME "CHARACTER" "COMPLEX" "INTEGER" "LOGICAL" "REAL")
 		foreach(TYPESIZE 1 2 4 8 16 32 64)
 			test_fort_type("BPP_${TYPENAME}${TYPESIZE}_WORKS" "${TYPENAME}" "${TYPESIZE}")
-			if ( "${BPP_${TYPENAME}${TYPESIZE}_WORKS}" )
+			if("${BPP_${TYPENAME}${TYPESIZE}_WORKS}")
 				set(BPP_FORTTYPES "${BPP_FORTTYPES}${TYPENAME}${TYPESIZE} ")
 			endif()
 		endforeach()
@@ -73,7 +76,7 @@ function(bpp_preprocess)
 		message(SEND_ERROR "Unexpected argument(s) to bpp_preprocess: ${BPP_PREPROCESS_UNPARSED_ARGUMENTS}")
 	endif()
 	
-	set(BPP_INCLUDE_PARAMS ${BPP_DEFAULT_INCLUDES})
+	unset(BPP_INCLUDE_PARAMS)
 
 	get_property(DIR_INCLUDE_DIRS DIRECTORY PROPERTY INCLUDE_DIRECTORIES)
 	foreach(INCLUDE_DIR ${DIR_INCLUDE_DIRS} ${BPP_PREPROCESS_INCLUDES})
@@ -85,14 +88,14 @@ function(bpp_preprocess)
 
 	bpp_gen_config("${CMAKE_CURRENT_BINARY_DIR}/bppconf/config.bpp.sh")
 	set(BPP_INCLUDE_PARAMS ${BPP_INCLUDE_PARAMS} "-I" "${CMAKE_CURRENT_BINARY_DIR}/bppconf")
-
+	
 	set(OUTFILES)
 	foreach(SRC ${BPP_PREPROCESS_SOURCES})
 		get_filename_component(OUTFILE "${SRC}" NAME)
 		string(REGEX REPLACE "\\.[bB][pP][pP]$" "" OUTFILE "${OUTFILE}")
 		set(OUTFILE "${CMAKE_CURRENT_BINARY_DIR}/${OUTFILE}")
 		add_custom_command(OUTPUT "${OUTFILE}"
-			COMMAND "${BPP_EXE}" ${BPP_INCLUDE_PARAMS} "${SRC}" "${OUTFILE}"
+			COMMAND "${_BPP_IMPORT_PREFIX}/bin/bpp" ${BPP_INCLUDE_PARAMS} "${SRC}" "${OUTFILE}"
 			WORKING_DIRECTORY "${CMAKE_CURRENT_SOURCE_DIR}"
 			MAIN_DEPENDENCY "${SRC}"
 			VERBATIM

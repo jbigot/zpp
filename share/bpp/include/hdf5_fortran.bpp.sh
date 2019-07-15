@@ -1,5 +1,5 @@
 ################################################################################
-# Copyright (c) 2013-2014, Julien Bigot - CEA (julien.bigot@cea.fr)
+# Copyright (c) 2013-2019, Julien Bigot - CEA (julien.bigot@cea.fr)
 # All rights reserved.
 #
 # Permission is hereby granted, free of charge, to any person obtaining a copy
@@ -21,15 +21,19 @@
 # THE SOFTWARE.
 ################################################################################
 
-# adapt to your installation path
-include /usr/share/Bpp/bpp.mk
-# for in-tree (no-install) usage
-#include ~/bpp_build/bpp.mk
+source fortran.bpp.sh
 
-example: example.F90
-	$(FC) -o $@ $<
+HDF5TYPES='INTEGER REAL REAL8 CHARACTER'
 
-.PHONY: clean
-
-clean:
-	$(RM) example example.F90 *.mod
+# Returns the HDF5 type constant associated to the one letter type descriptor $1
+hdf5_constant()
+{
+	case "$1" in
+	'REAL8')
+		echo -n 'H5T_NATIVE_DOUBLE'
+		;;
+	'REAL'|'CHARACTER'|'INTEGER')
+		echo -n "H5T_NATIVE_${1}"
+		;;
+	esac
+}

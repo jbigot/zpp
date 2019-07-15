@@ -1,5 +1,5 @@
 ##############################################################################
-# Copyright (c) 2013-2014, Julien Bigot - CEA (julien.bigot@cea.fr)
+# Copyright (c) 2013-2019, Julien Bigot - CEA (julien.bigot@cea.fr)
 #
 # Permission is hereby granted, free of charge, to any person obtaining a copy
 # of this software and associated documentation files (the "Software"), to deal
@@ -21,46 +21,28 @@
 ##############################################################################
 
 cmake_minimum_required(VERSION 2.8)
-# protect the project call to workaround a cmake bug
+
 if("${CMAKE_CURRENT_SOURCE_DIR}" STREQUAL "${CMAKE_SOURCE_DIR}")
-	project(Bpp Fortran)
+	project(Bpp NONE)
+else()
+	cmake_policy(PUSH)
+	include("${CMAKE_CURRENT_SOURCE_DIR}/share/bpp/cmake/Bpp.cmake")
+	set(_BPP_IMPORT_PREFIX "${_BPP_IMPORT_PREFIX}" PARENT_SCOPE)
+	cmake_policy(POP)
+	return()
 endif()
 
-if(POLICY CMP0054)
-	cmake_policy(SET CMP0054 NEW)
-endif()
-
-include(cmake/Bpp.cmake)
-
-file(READ VERSION BPP_VERSION)
-string(REGEX REPLACE "\n.*" "" BPP_VERSION "${BPP_VERSION}")
-
-
-# The executable
-
-configure_file(scripts/bpp "${CMAKE_CURRENT_BINARY_DIR}/bpp" @ONLY)
-
+file(READ bin/bpp BPP_VERSION LIMIT 8192)
+string(REGEX MATCH "\n *__version__ *= *'([^\n]*)'\n" BPP_VERSION "${BPP_VERSION}")
+string(REGEX REPLACE "\n *__version__ *= *'([^\n]*)'\n" "\\1" BPP_VERSION "${BPP_VERSION}")
 
 # Installation
 
-configure_file(cmake/BppConfig.cmake.in "${CMAKE_CURRENT_BINARY_DIR}/BppConfig.cmake" @ONLY)
 configure_file(cmake/BppConfigVersion.cmake.in "${CMAKE_CURRENT_BINARY_DIR}/BppConfigVersion.cmake" @ONLY)
-configure_file(scripts/bpp.mk.in "${CMAKE_CURRENT_BINARY_DIR}/bpp.mk" @ONLY)
 
-install(PROGRAMS ${CMAKE_CURRENT_BINARY_DIR}/bpp
-	DESTINATION bin
-)
-install(DIRECTORY include/
-	DESTINATION share/bpp/include/
-	FILES_MATCHING PATTERN "*.bpp.sh"
-)
-install(FILES "${CMAKE_CURRENT_BINARY_DIR}/bpp.mk"
-	DESTINATION share/bpp/
-)
+install(PROGRAMS bin/bpp DESTINATION bin)
+install(DIRECTORY share/ DESTINATION share)
 install(FILES
-		cmake/Bpp.cmake
-		cmake/TestFortType.cmake
-		"${CMAKE_CURRENT_BINARY_DIR}/BppConfig.cmake"
 		"${CMAKE_CURRENT_BINARY_DIR}/BppConfigVersion.cmake"
-	DESTINATION "share/bpp-${BPP_VERSION}/cmake/"
+	DESTINATION "share/bpp/cmake/"
 )

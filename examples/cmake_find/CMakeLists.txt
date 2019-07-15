@@ -1,5 +1,5 @@
 ################################################################################
-# Copyright (c) 2013-2014, Julien Bigot - CEA (julien.bigot@cea.fr)
+# Copyright (c) 2013-2019, Julien Bigot - CEA (julien.bigot@cea.fr)
 # All rights reserved.
 #
 # Permission is hereby granted, free of charge, to any person obtaining a copy
@@ -21,7 +21,11 @@
 # THE SOFTWARE.
 ################################################################################
 
-# All types supported by the current Fortran implementation
-BPP_FORTTYPES="CHARACTER1 COMPLEX4 COMPLEX8 INTEGER1 INTEGER2 INTEGER4 INTEGER8 LOGICAL1 LOGICAL2 LOGICAL4 LOGICAL8 REAL4 REAL8 "
-# for compatibility
-FORTTYPES="${BPP_FORTTYPES}"
+cmake_minimum_required(VERSION 2.8)
+project(BppExample Fortran)
+
+list(INSERT CMAKE_PREFIX_PATH 0 "${CMAKE_CURRENT_SOURCE_DIR}/../../")
+find_package(Bpp REQUIRED)
+
+bpp_preprocess(SRC_Bpp example.F90.bpp)
+add_executable(example ${SRC_Bpp})

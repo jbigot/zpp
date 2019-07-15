@@ -1,5 +1,5 @@
 ################################################################################
-# Copyright (c) 2013-2014, Julien Bigot - CEA (julien.bigot@cea.fr)
+# Copyright (c) 2013-2019, Julien Bigot - CEA (julien.bigot@cea.fr)
 # All rights reserved.
 #
 # Permission is hereby granted, free of charge, to any person obtaining a copy
@@ -21,24 +21,10 @@
 # THE SOFTWARE.
 ################################################################################
 
-if("${CMAKE_MAJOR_VERSION}.${CMAKE_MINOR_VERSION}" LESS 2.5)
-   message(FATAL_ERROR "CMake >= 2.6.0 required")
-endif()
-cmake_policy(PUSH)
-cmake_policy(VERSION 2.6)
+cmake_minimum_required(VERSION 2.8)
+project(BppExample Fortran)
 
+add_subdirectory(../../ bpp EXCLUDE_FROM_ALL)
 
-# Compute the installation prefix relative to this file.
-get_filename_component(_IMPORT_PREFIX "${CMAKE_CURRENT_LIST_FILE}" PATH)
-get_filename_component(_IMPORT_PREFIX "${_IMPORT_PREFIX}" PATH)
-get_filename_component(_IMPORT_PREFIX "${_IMPORT_PREFIX}" PATH)
-get_filename_component(_IMPORT_PREFIX "${_IMPORT_PREFIX}" PATH)
-if(_IMPORT_PREFIX STREQUAL "/")
-  set(_IMPORT_PREFIX "")
-endif()
-
-set(BPP_EXE "${_IMPORT_PREFIX}/bin/bpp")
-set(BPP_DEFAULT_INCLUDES "-I"  "${_IMPORT_PREFIX}/share/bpp/include/")
-include("${_IMPORT_PREFIX}/share/bpp-@BPP_VERSION@/cmake/Bpp.cmake")
-
-cmake_policy(POP)
+bpp_preprocess(SRC_Bpp example.F90.bpp)
+add_executable(example ${SRC_Bpp})

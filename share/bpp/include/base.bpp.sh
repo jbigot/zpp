@@ -1,5 +1,5 @@
 ################################################################################
-# Copyright (c) 2013-2014, Julien Bigot - CEA (julien.bigot@cea.fr)
+# Copyright (c) 2013-2019, Julien Bigot - CEA (julien.bigot@cea.fr)
 # All rights reserved.
 #
 # Permission is hereby granted, free of charge, to any person obtaining a copy
@@ -21,19 +21,35 @@
 # THE SOFTWARE.
 ################################################################################
 
-source fortran.bpp.sh
+# Repeats string $1 ($3-$2+1) times, separated by string $4 inside $5 $6
+# if $1 contains the '@N' substring, it will be replaced by the iteration number (from $2 to $3)
+function str_repeat() {
+  STR="$1"
+  FROM="$2"
+  TO="$3"
+  SEP="$4"
+  START="$5"
+  END="$6"
+  if [ "${TO}" -lt "${FROM}" ]; then return; fi
+  RES="${START}${STR//@N/${FROM}}"
+  (( ++FROM ))
+  for N in $(seq $FROM $TO); do
+    RES="${RES}${SEP}${STR//@N/${N}}"
+  done
+  echo "${RES}${END}"
+}
 
-HDF5TYPES='INTEGER REAL REAL8 CHARACTER'
-
-# Returns the HDF5 type constant associated to the one letter type descriptor $1
-hdf5_constant()
-{
-	case "$1" in
-	'REAL8')
-		echo -n 'H5T_NATIVE_DOUBLE'
-		;;
-	'REAL'|'CHARACTER'|'INTEGER')
-		echo -n "H5T_NATIVE_${1}"
-		;;
-	esac
+# Repeats string $1 ($3-$2+1) times, separated by string $4
+# if $1 contains the '@N' substring, it will be replaced by the iteration number (from $3 to $2)
+function str_repeat_reverse() {
+  STR="$1"
+  FROM="$2"
+  TO="$3"
+  SEP="$4"
+  RES="${STR//@N/${TO}}"
+  TO=$(($TO-1))
+  for N in $(seq $TO -1 $FROM); do
+    RES="${RES}${SEP}${STR//@N/${N}}"
+  done
+  echo "$RES"
 }

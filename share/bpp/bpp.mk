@@ -1,5 +1,5 @@
 ################################################################################
-# Copyright (c) 2013-2014, Julien Bigot - CEA (julien.bigot@cea.fr)
+# Copyright (c) 2013-2019, Julien Bigot - CEA (julien.bigot@cea.fr)
 # All rights reserved.
 #
 # Permission is hereby granted, free of charge, to any person obtaining a copy
@@ -21,10 +21,19 @@
 # THE SOFTWARE.
 ################################################################################
 
-cmake_minimum_required(VERSION 2.8)
-project(BppExample Fortran)
+BPP_COMPILER_ID:=Gnu
+BPP_PATH:=$(abspath $(lastword $(MAKEFILE_LIST))/../..)
 
-find_package(Bpp REQUIRED)
+BPP=$(BPP_PATH)/bin/bpp
 
-bpp_preprocess(SRC_Bpp example.F90.bpp)
-add_executable(example ${SRC_Bpp})
+%: %.bpp
+	$(BPP) -DBPP_CONFIG=config.$(BPP_COMPILER_ID) $(BPPOPTS) $< $@
+
+%.F90: %.F90.bpp
+	$(BPP) -DBPP_CONFIG=config.$(BPP_COMPILER_ID) $(BPPOPTS) $< $@
+
+%.h: %.h.bpp
+	$(BPP) -DBPP_CONFIG=config.$(BPP_COMPILER_ID) $(BPPOPTS) $< $@
+
+%.inc: %.inc.bpp
+	$(BPP) -DBPP_CONFIG=config.$(BPP_COMPILER_ID) $(BPPOPTS) $< $@
