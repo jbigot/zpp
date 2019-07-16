@@ -48,7 +48,7 @@ def callback_def(option, opt_str, value, parser):
     (optname, _, valval) = value.partition('=')
     parser.values.defines[optname.strip()] = valval.strip()
 
-parser = OptionParser(description="", version=__version__, usage='%prog [options...] <source> <destination>')
+parser = OptionParser(description="", version=__version__, usage="%prog [Options...] <source> <destination>\n  use `%prog -h' for more info")
 parser.add_option('-I',
                   action='append',
                   dest='includes',
@@ -111,8 +111,11 @@ try:
             tmpfile.write(EOCAT+"\n")
         tmpfile.close()
 
-        with open(args[1], 'w') as outfile:
-            result = call(['bash','-r', basename(tmpfile.name)], stdout=outfile, cwd=tmpdir)
+        if args[1] == '-':
+            result = call(['bash','-r', basename(tmpfile.name)], cwd=tmpdir)
+        else:
+            with open(args[1], 'w') as outfile:
+                result = call(['bash','-r', basename(tmpfile.name)], stdout=outfile, cwd=tmpdir)
 
 except Exception as e:
     print(e)

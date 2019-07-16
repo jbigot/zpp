@@ -22,9 +22,8 @@
 
 cmake_minimum_required(VERSION 2.8)
 
-if("${CMAKE_CURRENT_SOURCE_DIR}" STREQUAL "${CMAKE_SOURCE_DIR}")
-	project(Bpp NONE)
-else()
+# if we are added by add_subdirectory(), behave as with find_package
+if(NOT "${CMAKE_CURRENT_SOURCE_DIR}" STREQUAL "${CMAKE_SOURCE_DIR}")
 	cmake_policy(PUSH)
 	include("${CMAKE_CURRENT_SOURCE_DIR}/share/bpp/cmake/Bpp.cmake")
 	set(_BPP_IMPORT_PREFIX "${_BPP_IMPORT_PREFIX}" PARENT_SCOPE)
@@ -32,17 +31,7 @@ else()
 	return()
 endif()
 
-file(READ bin/bpp BPP_VERSION LIMIT 8192)
-string(REGEX MATCH "\n *__version__ *= *'([^\n]*)'\n" BPP_VERSION "${BPP_VERSION}")
-string(REGEX REPLACE "\n *__version__ *= *'([^\n]*)'\n" "\\1" BPP_VERSION "${BPP_VERSION}")
-
 # Installation
-
-configure_file(cmake/BppConfigVersion.cmake.in "${CMAKE_CURRENT_BINARY_DIR}/BppConfigVersion.cmake" @ONLY)
-
+project(Bpp NONE)
 install(PROGRAMS bin/bpp DESTINATION bin)
 install(DIRECTORY share/ DESTINATION share)
-install(FILES
-		"${CMAKE_CURRENT_BINARY_DIR}/BppConfigVersion.cmake"
-	DESTINATION "share/bpp/cmake/"
-)
