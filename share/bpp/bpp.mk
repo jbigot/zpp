@@ -27,13 +27,13 @@ BPP_PATH:=$(abspath $(lastword $(MAKEFILE_LIST))/../..)
 BPP=$(BPP_PATH)/bin/bpp
 
 %: %.bpp
-	$(BPP) -DBPP_CONFIG=config.$(BPP_COMPILER_ID) $(BPPOPTS) $< $@
+	$(BPP) -DBPP_CONFIG=config.$(BPP_COMPILER_ID) $(BPPOPTS) $(BPPFLAGS) $< $@
 
 %.F90: %.F90.bpp
-	$(BPP) -DBPP_CONFIG=config.$(BPP_COMPILER_ID) $(BPPOPTS) $< $@
+	$(BPP) -DBPP_CONFIG=config.$(BPP_COMPILER_ID) $(BPPOPTS) $(BPPFLAGS) $< $@
 
 %.h: %.h.bpp
-	$(BPP) -DBPP_CONFIG=config.$(BPP_COMPILER_ID) $(BPPOPTS) $< $@
+	$(BPP) -DBPP_CONFIG=config.$(BPP_COMPILER_ID) $(BPPOPTS) $(BPPFLAGS) $< $@
 
 %.inc: %.inc.bpp
-	$(BPP) -DBPP_CONFIG=config.$(BPP_COMPILER_ID) $(BPPOPTS) $< $@
+	$(BPP) -DBPP_CONFIG=config.$(BPP_COMPILER_ID) $(BPPOPTS) $(BPPFLAGS) $< $@
