@@ -24,20 +24,24 @@
 cmake_minimum_required(VERSION 2.8)
 cmake_policy(PUSH)
 
+# Compute the installation prefix relative to this file.
+get_filename_component(_CURRENT_LIST_DIR "${CMAKE_CURRENT_LIST_FILE}" PATH)
 
 # Compute the installation prefix relative to this file.
-get_filename_component(_BPP_IMPORT_PREFIX "${CMAKE_CURRENT_LIST_FILE}" PATH)
-get_filename_component(_BPP_IMPORT_PREFIX "${_BPP_IMPORT_PREFIX}" PATH)
-get_filename_component(_BPP_IMPORT_PREFIX "${_BPP_IMPORT_PREFIX}" PATH)
-get_filename_component(_BPP_IMPORT_PREFIX "${_BPP_IMPORT_PREFIX}" PATH)
-if(_BPP_IMPORT_PREFIX STREQUAL "/")
-	set(_BPP_IMPORT_PREFIX "")
+if(NOT DEFINED BPP_EXECUTABLE)
+	get_filename_component(_BPP_BIN_DIR "${CMAKE_CURRENT_LIST_FILE}" PATH)
+	get_filename_component(_BPP_BIN_DIR "${_BPP_BIN_DIR}" PATH)
+	get_filename_component(_BPP_BIN_DIR "${_BPP_BIN_DIR}" PATH)
+	get_filename_component(_BPP_BIN_DIR "${_BPP_BIN_DIR}" PATH)
+	if(_BPP_BIN_DIR STREQUAL "/")
+		set(_BPP_BIN_DIR "")
+	endif()
+	set(BPP_EXECUTABLE "${_BPP_BIN_DIR}/bin/bpp")
 endif()
-
 
 # A function to generate the BPP config.bpp.sh file
 function(bpp_gen_config OUTFILE)
-	include("${_BPP_IMPORT_PREFIX}/share/bpp/cmake/TestFortType.cmake")
+	include("${_CURRENT_LIST_DIR}/TestFortType.cmake")
 	foreach(TYPENAME "CHARACTER" "COMPLEX" "INTEGER" "LOGICAL" "REAL")
 		foreach(TYPESIZE 1 2 4 8 16 32 64)
 			test_fort_type("BPP_${TYPENAME}${TYPESIZE}_WORKS" "${TYPENAME}" "${TYPESIZE}")
@@ -95,7 +99,7 @@ function(bpp_preprocess)
 		string(REGEX REPLACE "\\.[bB][pP][pP]$" "" OUTFILE "${OUTFILE}")
 		set(OUTFILE "${CMAKE_CURRENT_BINARY_DIR}/${OUTFILE}")
 		add_custom_command(OUTPUT "${OUTFILE}"
-			COMMAND "${_BPP_IMPORT_PREFIX}/bin/bpp" ${BPP_INCLUDE_PARAMS} "${SRC}" "${OUTFILE}"
+			COMMAND "${BPP_EXECUTABLE}" ${BPP_INCLUDE_PARAMS} "${SRC}" "${OUTFILE}"
 			WORKING_DIRECTORY "${CMAKE_CURRENT_SOURCE_DIR}"
 			MAIN_DEPENDENCY "${SRC}"
 			VERBATIM

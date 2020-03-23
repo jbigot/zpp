@@ -25,13 +25,23 @@ cmake_minimum_required(VERSION 2.8)
 cmake_policy(PUSH)
 
 # Compute the installation prefix relative to this file.
-get_filename_component(_BPP_IMPORT_PREFIX "${CMAKE_CURRENT_LIST_FILE}" PATH)
-get_filename_component(_BPP_IMPORT_PREFIX "${_BPP_IMPORT_PREFIX}" PATH)
-get_filename_component(_BPP_IMPORT_PREFIX "${_BPP_IMPORT_PREFIX}" PATH)
-get_filename_component(_BPP_IMPORT_PREFIX "${_BPP_IMPORT_PREFIX}" PATH)
-if(_BPP_IMPORT_PREFIX STREQUAL "/")
-  set(_BPP_IMPORT_PREFIX "")
+get_filename_component(_CURRENT_LIST_DIR "${CMAKE_CURRENT_LIST_FILE}" PATH)
+
+# Hook for python to define the real relative path
+#@PYTHON_INSERT_BPP_EXECUTABLE@
+
+# Compute the installation prefix relative to this file.
+if(NOT DEFINED BPP_EXECUTABLE)
+	get_filename_component(_BPP_BIN_DIR "${CMAKE_CURRENT_LIST_FILE}" PATH)
+	get_filename_component(_BPP_BIN_DIR "${_BPP_BIN_DIR}" PATH)
+	get_filename_component(_BPP_BIN_DIR "${_BPP_BIN_DIR}" PATH)
+	get_filename_component(_BPP_BIN_DIR "${_BPP_BIN_DIR}" PATH)
+	if(_BPP_BIN_DIR STREQUAL "/")
+		set(_BPP_BIN_DIR "")
+	endif()
+	set(BPP_EXECUTABLE "${_BPP_BIN_DIR}/bin/bpp")
 endif()
-include("${_BPP_IMPORT_PREFIX}/share/bpp/cmake/Bpp.cmake")
+
+include("${_CURRENT_LIST_DIR}/Bpp.cmake")
 
 cmake_policy(POP)

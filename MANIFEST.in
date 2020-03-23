@@ -1,0 +1,4 @@
+include AUTHORS COPYING README.md
+include bpp/*.mk
+graft bpp/include
+graft bpp/cmake

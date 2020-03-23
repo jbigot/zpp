@@ -20,18 +20,35 @@
 # THE SOFTWARE.
 ##############################################################################
 
-cmake_minimum_required(VERSION 2.8)
+cmake_minimum_required(VERSION 3.5)
+
+# Compute the installation prefix relative to this file.
+get_filename_component(_CURRENT_LIST_DIR "${CMAKE_CURRENT_LIST_FILE}" PATH)
 
 # if we are added by add_subdirectory(), behave as with find_package
 if(NOT "${CMAKE_CURRENT_SOURCE_DIR}" STREQUAL "${CMAKE_SOURCE_DIR}")
-	cmake_policy(PUSH)
-	include("${CMAKE_CURRENT_SOURCE_DIR}/share/bpp/cmake/Bpp.cmake")
-	set(_BPP_IMPORT_PREFIX "${_BPP_IMPORT_PREFIX}" PARENT_SCOPE)
-	cmake_policy(POP)
+	set(BPP_EXECUTABLE "${_CURRENT_LIST_DIR}/bin/bpp")
+	include("${CMAKE_CURRENT_LIST_DIR}/bpp/cmake/Bpp.cmake")
 	return()
 endif()
 
-# Installation
+# Behave as a wrapper for the setuptools installer
+
 project(Bpp NONE)
-install(PROGRAMS bin/bpp DESTINATION bin)
-install(DIRECTORY share/ DESTINATION share)
+
+find_package(PythonInterp REQUIRED)
+
+message(WARNING "The cmake build-system is a simple wrapper for the setup.py, it will be removed in future versions, please switch to a direct use of setup.py")
+
+file(COPY
+	AUTHORS
+	bpp
+	COPYING
+	MANIFEST.in
+	README.md
+	setup.py
+	DESTINATION "${CMAKE_CURRENT_BINARY_DIR}/pypkg"
+	USE_SOURCE_PERMISSIONS)
+
+install(CODE "execute_process(COMMAND \"${PYTHON_EXECUTABLE}\" setup.py install --prefix \"${CMAKE_INSTALL_PREFIX}\"
+WORKING_DIRECTORY \"${CMAKE_CURRENT_BINARY_DIR}/pypkg\")")
