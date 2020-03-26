@@ -42,7 +42,7 @@ from sys import argv, exit, stderr
 from tempfile import NamedTemporaryFile, mkdtemp
 from uuid import uuid4
 
-from version import __version__
+from .version import __version__
 
 EOCAT = 'EOCAT_'+str(uuid4()).replace('-','_')
 TRIGGER_REGEX = compile('^\s*!\$SH\s+')
