@@ -132,7 +132,7 @@ setup(
         "Source Code": "https://github.com/pdidev/bpp/",
     },
     classifiers = [
-        "OSI Approved :: MIT License",
+        "License :: OSI Approved :: MIT License",
         "Development Status :: 5 - Production/Stable",
         "Environment :: Console",
     ],
