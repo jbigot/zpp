@@ -33,17 +33,16 @@ from fileinput import FileInput
 from optparse import OptionParser
 from os import listdir, makedirs, symlink, unlink
 from os.path import abspath, basename, dirname, exists, expanduser, isdir, join, relpath, samefile, splitext
-from pkg_resources import Requirement, resource_listdir, resource_stream
 from platform import system
 from re import compile
-from shutil import copyfile, copyfileobj, rmtree
+from shutil import copyfileobj, rmtree
 from site import getuserbase, getusersitepackages
 from subprocess import call
 from sys import argv, exit, stderr
 from tempfile import NamedTemporaryFile, mkdtemp
 from uuid import uuid4
 
-__version__ = '0.4.0'
+from version import __version__
 
 EOCAT = 'EOCAT_'+str(uuid4()).replace('-','_')
 TRIGGER_REGEX = compile('^\s*!\$SH\s+')
@@ -99,8 +98,14 @@ def parse_cmdline():
 
 def setup_dir(includes):
     tmpdir = mkdtemp(suffix='', prefix='bpp.tmp.')
-    for res_name in resource_listdir(Requirement.parse('bpp==0.4.0'), 'bpp/include'):
-        copyfileobj(resource_stream(Requirement.parse('bpp==0.4.0'), join('bpp/include', res_name)), open(join(tmpdir, res_name), 'wb'))
+    from pkg_resources import Requirement, resource_listdir, resource_stream, DistributionNotFound
+    try:
+        for res_name in resource_listdir(Requirement.parse('bpp=='+__version__), 'bpp/include'):
+            copyfileobj(resource_stream(Requirement.parse('bpp=='+__version__), join('bpp/include', res_name)), open(join(tmpdir, res_name), 'wb'))
+    except DistributionNotFound:
+        for res_name in listdir(join(abspath(dirname(__file__)), 'include')):
+            copyfileobj(open(join(abspath(dirname(__file__)), 'include', res_name), 'rb'), open(join(tmpdir, res_name), 'wb'))
+        
     for incdir in includes:
         if isdir(incdir):
             for incfile in listdir(incdir):

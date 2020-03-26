@@ -107,6 +107,10 @@ class PostInstallCommand(install):
         install.run(self)
         self.install_helpers()
 
+version = {}
+with open("bpp/version.py") as fp:
+    exec(fp.read(), version)
+
 setup(
     packages = [ 'bpp' ],
     zip_safe = True,
@@ -116,7 +120,7 @@ setup(
     cmdclass = { 'develop': PostDevelopCommand, 'install': PostInstallCommand },
     
     name = "bpp",
-    version = "0.4.0",
+    version = version['__version__'],
     author = "Julien Bigot",
     author_email = "julien.bigot@cea.fr",
     description = "a Bash Pre-Processor for Fortran. BPP is useful in order to build clean Fortran90 interfaces. It allows to generate Fortran code for all types, kinds, and array ranks supported by the compiler.",
