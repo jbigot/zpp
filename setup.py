@@ -23,48 +23,100 @@
 # THE SOFTWARE.
 ################################################################################
 
-from os.path import dirname, join
+from os import listdir, makedirs
+from os.path import abspath, dirname, expanduser, isdir, join, relpath, samefile
+from platform import system
 from setuptools import setup
 from setuptools.command.develop import develop
 from setuptools.command.install import install
-from sys import path
+from shutil import copyfileobj
+from sys import stderr
+try:
+    from builtins import bytes
+except ImportError:
+    from __builtin__ import bytes
+
+def install_helpers_method(self):
+    print("running install_wrappers")
+    
+    share_dir = join('share', self.config_vars["dist_name"])
+    cmake_dir = join(share_dir, 'cmake')
+    
+    prefix = self.install_data
+    
+    if self.user:
+        print("Registering in cmake user registry")
+        if system() == 'Linux':
+            cmake_registry = abspath(expanduser("~/.cmake/packages/"))
+            if (self.root is not None):
+              cmake_registry = abspath(abspath(self.root)+cmake_registry)
+            if not isdir(cmake_registry):
+                makedirs(cmake_registry)
+            cmake_registry_file = join(cmake_registry, self.config_vars["dist_fullname"])
+            print("Writing cmake registry file: "+cmake_registry_file)
+            with open(cmake_registry_file, 'w') as bppfile:
+                bppfile.write(join(self.install_userbase, cmake_dir)+"\n")
+        else:
+            print("Not registering in cmake user registry: unsupported system type ("+system()+")")
+    else:
+        if isdir(prefix) and samefile(prefix, '/'):
+            prefix = join(prefix, 'usr')
+    
+    share_dir = join(prefix, share_dir)
+    cmake_dir = join(prefix, cmake_dir)
+    
+    if not isdir(share_dir):
+        makedirs(share_dir)
+    for res_name in listdir('bpp'):
+        if ( res_name[-3:] == '.mk' ):
+            dst = join(share_dir, res_name)
+            print('Installing '+res_name+' wrapper to '+share_dir)
+            copyfileobj(open(join('bpp', res_name), 'rb'), open(dst, 'wb'))
+    
+    if not isdir(cmake_dir):
+        makedirs(cmake_dir)
+    rel_cmake_path = relpath(abspath(self.install_scripts), cmake_dir)
+    try:
+        rel_cmake_path = bytes(rel_cmake_path, encoding='utf8')
+    except:
+        rel_cmake_path = bytes(rel_cmake_path)
+    for res_name in listdir(join('bpp', 'cmake')):
+        dst = join(cmake_dir, res_name)
+        print('Installing '+res_name+' wrapper to '+cmake_dir)
+        data_in = open(join('bpp', 'cmake', res_name), 'rb')
+        with open(dst, 'wb') as data_out:
+            if res_name == 'BppConfig.cmake':
+                for line in data_in:
+                    if bytes(b'@PYTHON_INSERT_BPP_EXECUTABLE@') in line:
+                        data_out.write(bytes(b'get_filename_component(BPP_EXECUTABLE "${_CURRENT_LIST_DIR}/'+rel_cmake_path+b'" ABSOLUTE)\n'))
+                    else:
+                        data_out.write(line)
+            else:
+                copyfileobj(data_in, data_out)
+    
 
 class PostDevelopCommand(develop):
-    """Post-installation for development mode."""
+    install_helpers = install_helpers_method
     def run(self):
         develop.run(self)
-        path.insert(0, self.install_purelib)
-        import bpp
-        bpp.do_install_helpers(self.install_data)
+        self.install_helpers()
 
 class PostInstallCommand(install):
-    """Post-installation for installation mode."""
+    install_helpers = install_helpers_method
     def run(self):
         install.run(self)
-        path.insert(0, self.install_purelib)
-        import bpp
-        bpp.do_install_helpers(self.install_data)
+        self.install_helpers()
 
 setup(
+    packages = [ 'bpp' ],
+    zip_safe = True,
+    entry_points = { "console_scripts": [ "bpp = bpp:main" ] },
+    package_data = { "bpp": ["include/*.bpp.sh"] },
+    install_requires = [ 'setuptools' ],
+    cmdclass = { 'develop': PostDevelopCommand, 'install': PostInstallCommand },
+    
     name = "bpp",
     version = "0.4.0",
-    zip_safe = True,
-    packages = [ 'bpp' ],
-    include_package_data=True,
-    package_data={
-        "": ["cmake/*", "*.mk"],
-    },
-    entry_points = {
-        "console_scripts": [
-            "bpp = bpp:main",
-            "bpp-setuphelpers = bpp:install_helpers",
-        ],
-    },
-    cmdclass={
-        'develop': PostDevelopCommand,
-        'install': PostInstallCommand,
-    },
-
     author = "Julien Bigot",
     author_email = "julien.bigot@cea.fr",
     description = "a Bash Pre-Processor for Fortran. BPP is useful in order to build clean Fortran90 interfaces. It allows to generate Fortran code for all types, kinds, and array ranks supported by the compiler.",
@@ -79,5 +131,5 @@ setup(
         "OSI Approved :: MIT License",
         "Development Status :: 5 - Production/Stable",
         "Environment :: Console",
-    ]
+    ],
 )
