@@ -88,7 +88,7 @@ def install_helpers_method(self):
             if res_name == 'BppConfig.cmake':
                 for line in data_in:
                     if bytes(b'@PYTHON_INSERT_BPP_EXECUTABLE@') in line:
-                        data_out.write(bytes(b'get_filename_component(BPP_EXECUTABLE "${_CURRENT_LIST_DIR}/'+rel_cmake_path+b'" ABSOLUTE)\n'))
+                        data_out.write(bytes(b'get_filename_component(BPP_EXECUTABLE "${_CURRENT_LIST_DIR}/'+rel_cmake_path+b'/bpp" ABSOLUTE)\n'))
                     else:
                         data_out.write(line)
             else:
