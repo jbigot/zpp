@@ -44,8 +44,14 @@ from uuid import uuid4
 
 from .version import __version__
 
-EOCAT = 'EOCAT_'+str(uuid4()).replace('-','_')
-TRIGGER_REGEX = compile('^\s*!\$SH\s+')
+def abytes(var):
+    try:
+        return bytes(var, 'ASCII')
+    except TypeError:
+        return bytes(var)
+
+EOCAT = b'EOCAT_'+ abytes(str(uuid4())).replace(b'-',b'_')
+TRIGGER_REGEX = compile(b'^\s*!\$SH\s+')
 
 def parse_cmdline():
     def callback_def(option, opt_str, value, parser):
@@ -119,24 +125,24 @@ def setup_dir(includes):
     return tmpdir
 
 def handle_file(tmpdir, input, defines, output):
-    with open(join(tmpdir, basename(input)+'.bash'), 'w') as tmpfile:
+    with open(join(tmpdir, basename(input)+'.bash'), 'wb') as tmpfile:
         inbash=True
         for var in defines:
-            tmpfile.write(var+'='+defines[var]+"\n")
-        with open(input, 'r') as infile:
+            tmpfile.write(abytes(var)+b'='+abytes(defines[var])+b"\n")
+        with open(input, 'rb') as infile:
             for line in infile:
                 if TRIGGER_REGEX.match(line):
                     if not inbash:
-                        tmpfile.write(EOCAT+"\n")
+                        tmpfile.write(EOCAT+b"\n")
                         inbash=True
-                    tmpfile.write(TRIGGER_REGEX.sub('', line, 1))
+                    tmpfile.write(TRIGGER_REGEX.sub(b'', line, 1))
                 else:
                     if inbash:
-                        tmpfile.write("cat<<"+EOCAT+"\n")
+                        tmpfile.write(b"cat<<"+EOCAT+b"\n")
                         inbash=False
                     tmpfile.write(line)
         if not inbash:
-            tmpfile.write(EOCAT+"\n")
+            tmpfile.write(EOCAT+b"\n")
         tmpfile.close()
 
         if output == '-':
