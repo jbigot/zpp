@@ -1,5 +1,5 @@
 ################################################################################
-# Copyright (c) 2013-2019, Julien Bigot - CEA (julien.bigot@cea.fr)
+# Copyright (c) Julien Bigot - CEA (julien.bigot@cea.fr)
 # All rights reserved.
 #
 # Permission is hereby granted, free of charge, to any person obtaining a copy
@@ -21,7 +21,19 @@
 # THE SOFTWARE.
 ################################################################################
 
-# All types supported by the current Fortran implementation
-BPP_FORTTYPES="CHARACTER1 COMPLEX4 COMPLEX8 INTEGER1 INTEGER2 INTEGER4 INTEGER8 LOGICAL1 LOGICAL2 LOGICAL4 LOGICAL8 REAL4 REAL8 "
-# for compatibility
-FORTTYPES="${BPP_FORTTYPES}"
+ZPP_COMPILER_ID:=Gnu
+ZPP_PATH:=$(abspath $(lastword $(MAKEFILE_LIST))/../..)
+
+ZPP=$(ZPP_PATH)/bin/zpp
+
+%: %.zpp
+	$(ZPP) -DZPP_CONFIG=config.$(ZPP_COMPILER_ID) $(ZPPOPTS) $(ZPPFLAGS) $< $@
+
+%.F90: %.F90.zpp
+	$(ZPP) -DZPP_CONFIG=config.$(ZPP_COMPILER_ID) $(ZPPOPTS) $(ZPPFLAGS) $< $@
+
+%.h: %.h.zpp
+	$(ZPP) -DZPP_CONFIG=config.$(ZPP_COMPILER_ID) $(ZPPOPTS) $(ZPPFLAGS) $< $@
+
+%.inc: %.inc.zpp
+	$(ZPP) -DZPP_CONFIG=config.$(ZPP_COMPILER_ID) $(ZPPOPTS) $(ZPPFLAGS) $< $@

@@ -1,5 +1,5 @@
 ################################################################################
-# Copyright (c) 2013-2019, Julien Bigot - CEA (julien.bigot@cea.fr)
+# Copyright (c) Julien Bigot - CEA (julien.bigot@cea.fr)
 # All rights reserved.
 #
 # Permission is hereby granted, free of charge, to any person obtaining a copy
@@ -21,19 +21,5 @@
 # THE SOFTWARE.
 ################################################################################
 
-BPP_COMPILER_ID:=Gnu
-BPP_PATH:=$(abspath $(lastword $(MAKEFILE_LIST))/../..)
-
-BPP=$(BPP_PATH)/bin/bpp
-
-%: %.bpp
-	$(BPP) -DBPP_CONFIG=config.$(BPP_COMPILER_ID) $(BPPOPTS) $(BPPFLAGS) $< $@
-
-%.F90: %.F90.bpp
-	$(BPP) -DBPP_CONFIG=config.$(BPP_COMPILER_ID) $(BPPOPTS) $(BPPFLAGS) $< $@
-
-%.h: %.h.bpp
-	$(BPP) -DBPP_CONFIG=config.$(BPP_COMPILER_ID) $(BPPOPTS) $(BPPFLAGS) $< $@
-
-%.inc: %.inc.bpp
-	$(BPP) -DBPP_CONFIG=config.$(BPP_COMPILER_ID) $(BPPOPTS) $(BPPFLAGS) $< $@
+# All types supported by the current Fortran implementation
+ZPP_FORT_TYPES="CHARACTER1 CHARACTER2 COMPLEX4 COMPLEX8 INTEGER1 INTEGER2 INTEGER4 INTEGER8 LOGICAL1 LOGICAL2 LOGICAL4 LOGICAL8 REAL4 REAL8 "

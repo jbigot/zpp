@@ -1,5 +1,5 @@
 ################################################################################
-# Copyright (c) 2013-2019, Julien Bigot - CEA (julien.bigot@cea.fr)
+# Copyright (c) Julien Bigot - CEA (julien.bigot@cea.fr)
 # All rights reserved.
 #
 # Permission is hereby granted, free of charge, to any person obtaining a copy
@@ -96,18 +96,18 @@ def parse_cmdline():
         output = abspath(args[1])
     else:
         (root, ext) = splitext(input)
-        if ext.lower() == '.bpp':
+        if ext.lower() == '.zpp':
             output = root
         else:
-            output = input+'.unbpp'
+            output = input+'.unzpp'
     return (input, output, opts.includes, opts.defines)
 
 def setup_dir(includes):
-    tmpdir = mkdtemp(suffix='', prefix='bpp.tmp.')
+    tmpdir = mkdtemp(suffix='', prefix='zpp.tmp.')
     from pkg_resources import Requirement, resource_listdir, resource_stream, DistributionNotFound
     try:
-        for res_name in resource_listdir(Requirement.parse('bpp=='+__version__), 'bpp/include'):
-            copyfileobj(resource_stream(Requirement.parse('bpp=='+__version__), join('bpp/include', res_name)), open(join(tmpdir, res_name), 'wb'))
+        for res_name in resource_listdir(Requirement.parse('zpp=='+__version__), 'zpp/include'):
+            copyfileobj(resource_stream(Requirement.parse('zpp=='+__version__), join('zpp/include', res_name)), open(join(tmpdir, res_name), 'wb'))
     except DistributionNotFound:
         for res_name in listdir(join(abspath(dirname(__file__)), 'include')):
             copyfileobj(open(join(abspath(dirname(__file__)), 'include', res_name), 'rb'), open(join(tmpdir, res_name), 'wb'))
@@ -115,7 +115,7 @@ def setup_dir(includes):
     for incdir in includes:
         if isdir(incdir):
             for incfile in listdir(incdir):
-                if incfile[-7:] == '.bpp.sh':
+                if incfile[-7:] == '.zpp.sh':
                     src = abspath(join(incdir, incfile))
                     dst = join(tmpdir, basename(incfile))
                     if not exists(dst):

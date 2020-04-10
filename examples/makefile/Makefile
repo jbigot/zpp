@@ -1,5 +1,5 @@
 ################################################################################
-# Copyright (c) 2013-2019, Julien Bigot - CEA (julien.bigot@cea.fr)
+# Copyright (c) Julien Bigot - CEA (julien.bigot@cea.fr)
 # All rights reserved.
 #
 # Permission is hereby granted, free of charge, to any person obtaining a copy
@@ -21,7 +21,7 @@
 # THE SOFTWARE.
 ################################################################################
 
-include ../../share/bpp/bpp.mk
+include ../../share/zpp/zpp.mk
 
 example: example.F90
 	$(FC) -o $@ $<

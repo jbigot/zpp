@@ -1,5 +1,5 @@
 ################################################################################
-# Copyright (c) 2013-2019, Julien Bigot - CEA (julien.bigot@cea.fr)
+# Copyright (c) Julien Bigot - CEA (julien.bigot@cea.fr)
 # All rights reserved.
 #
 # Permission is hereby granted, free of charge, to any person obtaining a copy
@@ -21,28 +21,4 @@
 # THE SOFTWARE.
 ################################################################################
 
-# Compute the installation prefix relative to this file.
-get_filename_component(_BPP_IMPORT_PREFIX "${CMAKE_CURRENT_LIST_FILE}" PATH)
-get_filename_component(_BPP_IMPORT_PREFIX "${_BPP_IMPORT_PREFIX}" PATH)
-get_filename_component(_BPP_IMPORT_PREFIX "${_BPP_IMPORT_PREFIX}" PATH)
-get_filename_component(_BPP_IMPORT_PREFIX "${_BPP_IMPORT_PREFIX}" PATH)
-if(_BPP_IMPORT_PREFIX STREQUAL "/")
-	set(_BPP_IMPORT_PREFIX "")
-endif()
-
-execute_process(COMMAND "${_BPP_IMPORT_PREFIX}/bin/bpp" "--version"
-	RESULT_VARIABLE _BPP_VERSION_RESULT
-	OUTPUT_VARIABLE PACKAGE_VERSION
-	ERROR_QUIET
-	OUTPUT_STRIP_TRAILING_WHITESPACE
-)
-
-# Check whether the requested PACKAGE_FIND_VERSION is compatible
-if("${PACKAGE_VERSION}" VERSION_LESS "${PACKAGE_FIND_VERSION}")
-  set(PACKAGE_VERSION_COMPATIBLE FALSE)
-else()
-  set(PACKAGE_VERSION_COMPATIBLE TRUE)
-  if ("${PACKAGE_VERSION}" VERSION_EQUAL "${PACKAGE_FIND_VERSION}")
-    set(PACKAGE_VERSION_EXACT TRUE)
-  endif()
-endif()
+__version__ = '0.4.5'

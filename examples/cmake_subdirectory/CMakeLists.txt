@@ -1,5 +1,5 @@
 ################################################################################
-# Copyright (c) 2013-2019, Julien Bigot - CEA (julien.bigot@cea.fr)
+# Copyright (c) Julien Bigot - CEA (julien.bigot@cea.fr)
 # All rights reserved.
 #
 # Permission is hereby granted, free of charge, to any person obtaining a copy
@@ -22,9 +22,9 @@
 ################################################################################
 
 cmake_minimum_required(VERSION 2.8)
-project(BppExample Fortran)
+project(ZppExample Fortran)
 
-add_subdirectory(../../ bpp EXCLUDE_FROM_ALL)
+add_subdirectory(../../ zpp EXCLUDE_FROM_ALL)
 
-bpp_preprocess(SRC_Bpp example.F90.bpp)
-add_executable(example ${SRC_Bpp})
+zpp_preprocess(SRC_Zpp example.F90.zpp)
+add_executable(example ${SRC_Zpp})

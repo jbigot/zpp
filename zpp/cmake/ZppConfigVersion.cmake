@@ -1,5 +1,5 @@
 ################################################################################
-# Copyright (c) 2013-2019, Julien Bigot - CEA (julien.bigot@cea.fr)
+# Copyright (c) Julien Bigot - CEA (julien.bigot@cea.fr)
 # All rights reserved.
 #
 # Permission is hereby granted, free of charge, to any person obtaining a copy
@@ -21,27 +21,28 @@
 # THE SOFTWARE.
 ################################################################################
 
-cmake_minimum_required(VERSION 2.8)
-cmake_policy(PUSH)
-
 # Compute the installation prefix relative to this file.
-get_filename_component(_CURRENT_LIST_DIR "${CMAKE_CURRENT_LIST_FILE}" PATH)
-
-# Hook for python to define the real relative path
-#@PYTHON_INSERT_BPP_EXECUTABLE@
-
-# Compute the installation prefix relative to this file.
-if(NOT DEFINED BPP_EXECUTABLE)
-	get_filename_component(_BPP_BIN_DIR "${CMAKE_CURRENT_LIST_FILE}" PATH)
-	get_filename_component(_BPP_BIN_DIR "${_BPP_BIN_DIR}" PATH)
-	get_filename_component(_BPP_BIN_DIR "${_BPP_BIN_DIR}" PATH)
-	get_filename_component(_BPP_BIN_DIR "${_BPP_BIN_DIR}" PATH)
-	if(_BPP_BIN_DIR STREQUAL "/")
-		set(_BPP_BIN_DIR "")
-	endif()
-	set(BPP_EXECUTABLE "${_BPP_BIN_DIR}/bin/bpp")
+get_filename_component(_ZPP_IMPORT_PREFIX "${CMAKE_CURRENT_LIST_FILE}" PATH)
+get_filename_component(_ZPP_IMPORT_PREFIX "${_ZPP_IMPORT_PREFIX}" PATH)
+get_filename_component(_ZPP_IMPORT_PREFIX "${_ZPP_IMPORT_PREFIX}" PATH)
+get_filename_component(_ZPP_IMPORT_PREFIX "${_ZPP_IMPORT_PREFIX}" PATH)
+if(_ZPP_IMPORT_PREFIX STREQUAL "/")
+	set(_ZPP_IMPORT_PREFIX "")
 endif()
 
-include("${_CURRENT_LIST_DIR}/Bpp.cmake")
+execute_process(COMMAND "${_ZPP_IMPORT_PREFIX}/bin/zpp" "--version"
+	RESULT_VARIABLE _ZPP_VERSION_RESULT
+	OUTPUT_VARIABLE PACKAGE_VERSION
+	ERROR_QUIET
+	OUTPUT_STRIP_TRAILING_WHITESPACE
+)
 
-cmake_policy(POP)
+# Check whether the requested PACKAGE_FIND_VERSION is compatible
+if("${PACKAGE_VERSION}" VERSION_LESS "${PACKAGE_FIND_VERSION}")
+  set(PACKAGE_VERSION_COMPATIBLE FALSE)
+else()
+  set(PACKAGE_VERSION_COMPATIBLE TRUE)
+  if ("${PACKAGE_VERSION}" VERSION_EQUAL "${PACKAGE_FIND_VERSION}")
+    set(PACKAGE_VERSION_EXACT TRUE)
+  endif()
+endif()

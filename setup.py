@@ -1,7 +1,7 @@
 #!/usr/bin/env python
 
 ################################################################################
-# Copyright (c) 2013-2019, Julien Bigot - CEA (julien.bigot@cea.fr)
+# Copyright (c) Julien Bigot - CEA (julien.bigot@cea.fr)
 # All rights reserved.
 #
 # Permission is hereby granted, free of charge, to any person obtaining a copy
@@ -54,8 +54,8 @@ def install_helpers_method(self):
                 makedirs(cmake_registry)
             cmake_registry_file = join(cmake_registry, self.config_vars["dist_fullname"])
             print("Writing cmake registry file: "+cmake_registry_file)
-            with open(cmake_registry_file, 'w') as bppfile:
-                bppfile.write(join(self.install_userbase, cmake_dir)+"\n")
+            with open(cmake_registry_file, 'w') as zppfile:
+                zppfile.write(join(self.install_userbase, cmake_dir)+"\n")
         else:
             print("Not registering in cmake user registry: unsupported system type ("+system()+")")
     else:
@@ -67,11 +67,11 @@ def install_helpers_method(self):
     
     if not isdir(share_dir):
         makedirs(share_dir)
-    for res_name in listdir('bpp'):
+    for res_name in listdir('zpp'):
         if ( res_name[-3:] == '.mk' ):
             dst = join(share_dir, res_name)
             print('Installing '+res_name+' wrapper to '+share_dir)
-            copyfileobj(open(join('bpp', res_name), 'rb'), open(dst, 'wb'))
+            copyfileobj(open(join('zpp', res_name), 'rb'), open(dst, 'wb'))
     
     if not isdir(cmake_dir):
         makedirs(cmake_dir)
@@ -80,15 +80,15 @@ def install_helpers_method(self):
         rel_cmake_path = bytes(rel_cmake_path, encoding='utf8')
     except:
         rel_cmake_path = bytes(rel_cmake_path)
-    for res_name in listdir(join('bpp', 'cmake')):
+    for res_name in listdir(join('zpp', 'cmake')):
         dst = join(cmake_dir, res_name)
         print('Installing '+res_name+' wrapper to '+cmake_dir)
-        data_in = open(join('bpp', 'cmake', res_name), 'rb')
+        data_in = open(join('zpp', 'cmake', res_name), 'rb')
         with open(dst, 'wb') as data_out:
-            if res_name == 'BppConfig.cmake':
+            if res_name == 'ZppConfig.cmake':
                 for line in data_in:
-                    if bytes(b'@PYTHON_INSERT_BPP_EXECUTABLE@') in line:
-                        data_out.write(bytes(b'get_filename_component(BPP_EXECUTABLE "${_CURRENT_LIST_DIR}/'+rel_cmake_path+b'/bpp" ABSOLUTE)\n'))
+                    if bytes(b'@PYTHON_INSERT_ZPP_EXECUTABLE@') in line:
+                        data_out.write(bytes(b'get_filename_component(ZPP_EXECUTABLE "${_CURRENT_LIST_DIR}/'+rel_cmake_path+b'/zpp" ABSOLUTE)\n'))
                     else:
                         data_out.write(line)
             else:
@@ -108,28 +108,28 @@ class PostInstallCommand(install):
         self.install_helpers()
 
 version = {}
-with open("bpp/version.py") as fp:
+with open("zpp/version.py") as fp:
     exec(fp.read(), version)
 
 setup(
-    packages = [ 'bpp' ],
+    packages = [ 'zpp' ],
     zip_safe = True,
-    entry_points = { "console_scripts": [ "bpp = bpp:main" ] },
-    package_data = { "bpp": ["include/*.bpp.sh"] },
+    entry_points = { "console_scripts": [ "zpp = zpp:main" ] },
+    package_data = { "zpp": ["include/*.zpp.sh"] },
     install_requires = [ 'setuptools' ],
     cmdclass = { 'develop': PostDevelopCommand, 'install': PostInstallCommand },
     
-    name = "bpp",
+    name = "zpp",
     version = version['__version__'],
     author = "Julien Bigot",
     author_email = "julien.bigot@cea.fr",
-    description = "a Bash Pre-Processor for Fortran. BPP is useful in order to build clean Fortran90 interfaces. It allows to generate Fortran code for all types, kinds, and array ranks supported by the compiler.",
+    description = "a Bash Pre-Processor for Fortran. ZPP is useful in order to build clean Fortran90 interfaces. It allows to generate Fortran code for all types, kinds, and array ranks supported by the compiler.",
     long_description = open(join(dirname(__file__), 'README.md'), 'r').read(),
     long_description_content_type = "text/markdown",
     license = "MIT",
     keywords = "bash Fortran pre-processor",
     project_urls = {
-        "Source Code": "https://github.com/pdidev/bpp/",
+        "Source Code": "https://github.com/pdidev/zpp/",
     },
     classifiers = [
         "License :: OSI Approved :: MIT License",

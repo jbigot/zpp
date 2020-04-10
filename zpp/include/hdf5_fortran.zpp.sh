@@ -1,5 +1,5 @@
 ################################################################################
-# Copyright (c) 2013-2019, Julien Bigot - CEA (julien.bigot@cea.fr)
+# Copyright (c) Julien Bigot - CEA (julien.bigot@cea.fr)
 # All rights reserved.
 #
 # Permission is hereby granted, free of charge, to any person obtaining a copy
@@ -21,7 +21,19 @@
 # THE SOFTWARE.
 ################################################################################
 
-# All types supported by the current Fortran implementation
-BPP_FORTTYPES="CHARACTER1 COMPLEX4 COMPLEX8 INTEGER1 INTEGER2 INTEGER4 INTEGER8 LOGICAL1 LOGICAL2 LOGICAL4 LOGICAL8 REAL4 REAL8 "
-# for compatibility
-FORTTYPES="${BPP_FORTTYPES}"
+source fortran.zpp.sh
+
+ZPP_HDF5F_TYPES='INTEGER REAL REAL8 CHARACTER'
+
+# Returns the HDF5 type constant associated to the one letter type descriptor $1
+zpp_hdf5f_constant()
+{
+	case "$1" in
+	'REAL8')
+		echo -n 'H5T_NATIVE_DOUBLE'
+		;;
+	'REAL'|'CHARACTER'|'INTEGER')
+		echo -n "H5T_NATIVE_${1}"
+		;;
+	esac
+}

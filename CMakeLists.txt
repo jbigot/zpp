@@ -1,5 +1,5 @@
 ##############################################################################
-# Copyright (c) 2013-2019, Julien Bigot - CEA (julien.bigot@cea.fr)
+# Copyright (c) Julien Bigot - CEA (julien.bigot@cea.fr)
 #
 # Permission is hereby granted, free of charge, to any person obtaining a copy
 # of this software and associated documentation files (the "Software"), to deal
@@ -27,14 +27,14 @@ get_filename_component(_CURRENT_LIST_DIR "${CMAKE_CURRENT_LIST_FILE}" PATH)
 
 # if we are added by add_subdirectory(), behave as with find_package
 if(NOT "${CMAKE_CURRENT_SOURCE_DIR}" STREQUAL "${CMAKE_SOURCE_DIR}")
-	set(BPP_EXECUTABLE "${_CURRENT_LIST_DIR}/bin/bpp")
-	include("${CMAKE_CURRENT_LIST_DIR}/bpp/cmake/Bpp.cmake")
+	set(ZPP_EXECUTABLE "${_CURRENT_LIST_DIR}/bin/zpp")
+	include("${CMAKE_CURRENT_LIST_DIR}/zpp/cmake/Zpp.cmake")
 	return()
 endif()
 
 # Behave as a wrapper for the setuptools installer
 
-project(Bpp NONE)
+project(Zpp NONE)
 
 find_package(PythonInterp REQUIRED)
 
@@ -42,8 +42,8 @@ message(WARNING "The cmake build-system is a simple wrapper for the setup.py, it
 
 file(COPY
 	AUTHORS
-	bpp
-	COPYING
+	zpp
+	LICENSE.txt
 	MANIFEST.in
 	README.md
 	setup.py

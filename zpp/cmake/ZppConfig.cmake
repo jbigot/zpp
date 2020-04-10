@@ -1,5 +1,5 @@
 ################################################################################
-# Copyright (c) 2013-2019, Julien Bigot - CEA (julien.bigot@cea.fr)
+# Copyright (c) Julien Bigot - CEA (julien.bigot@cea.fr)
 # All rights reserved.
 #
 # Permission is hereby granted, free of charge, to any person obtaining a copy
@@ -21,7 +21,27 @@
 # THE SOFTWARE.
 ################################################################################
 
-# All types supported by the current Fortran implementation
-BPP_FORTTYPES="CHARACTER1 COMPLEX4 COMPLEX8 INTEGER1 INTEGER2 INTEGER4 INTEGER8 LOGICAL1 LOGICAL2 LOGICAL4 LOGICAL8 REAL4 REAL8 "
-# for compatibility
-FORTTYPES="${BPP_FORTTYPES}"
+cmake_minimum_required(VERSION 2.8)
+cmake_policy(PUSH)
+
+# Compute the installation prefix relative to this file.
+get_filename_component(_CURRENT_LIST_DIR "${CMAKE_CURRENT_LIST_FILE}" PATH)
+
+# Hook for python to define the real relative path
+#@PYTHON_INSERT_ZPP_EXECUTABLE@
+
+# Compute the installation prefix relative to this file.
+if(NOT DEFINED ZPP_EXECUTABLE)
+	get_filename_component(_ZPP_BIN_DIR "${CMAKE_CURRENT_LIST_FILE}" PATH)
+	get_filename_component(_ZPP_BIN_DIR "${_ZPP_BIN_DIR}" PATH)
+	get_filename_component(_ZPP_BIN_DIR "${_ZPP_BIN_DIR}" PATH)
+	get_filename_component(_ZPP_BIN_DIR "${_ZPP_BIN_DIR}" PATH)
+	if(_ZPP_BIN_DIR STREQUAL "/")
+		set(_ZPP_BIN_DIR "")
+	endif()
+	set(ZPP_EXECUTABLE "${_ZPP_BIN_DIR}/bin/zpp")
+endif()
+
+include("${_CURRENT_LIST_DIR}/Zpp.cmake")
+
+cmake_policy(POP)

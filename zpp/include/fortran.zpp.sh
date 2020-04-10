@@ -1,5 +1,5 @@
 ################################################################################
-# Copyright (c) 2013-2019, Julien Bigot - CEA (julien.bigot@cea.fr)
+# Copyright (c) Julien Bigot - CEA (julien.bigot@cea.fr)
 # All rights reserved.
 #
 # Permission is hereby granted, free of charge, to any person obtaining a copy
@@ -21,51 +21,51 @@
 # THE SOFTWARE.
 ################################################################################
 
-# default definition for FORTTYPES if unable to find config
-FORTTYPES="CHARACTER1 COMPLEX4 COMPLEX8 INTEGER1 INTEGER2 INTEGER4 INTEGER8 LOGICAL1 REAL4 REAL8"
+# The list of types supported by the fortran compiler as zpp:typeIDs.
+ZPP_FORT_TYPES="CHARACTER1 COMPLEX4 COMPLEX8 INTEGER1 INTEGER2 INTEGER4 INTEGER8 LOGICAL1 REAL4 REAL8"
 
-source base.bpp.sh
-CONFIG_FILE="${BPP_CONFIG:-config}.bpp.sh"
-if [ -r "${CONFIG_FILE}" ]
+source base.zpp.sh
+ZPP_FORT_FILE="${ZPP_CONFIG:-config}.zpp.sh"
+if [ -r "${ZPP_FORT_FILE}" ]
 then
-	source "${CONFIG_FILE}"
+	source "${ZPP_FORT_FILE}"
 fi
 
 # Returns the Fortran kind associated to the type descriptor $1
-function fort_kind {
+function zpp_fort_kind {
 	echo -n "$1" | sed 's/[^0-9]*//g'
 }
 
 # Returns the Fortran type associated to the type descriptor $1
-function fort_ptype {
+function zpp_fort_ptype {
 	echo -n "$1" | sed 's/[^a-zA-Z_]*//g'
 }
 
 # Returns the Fortran type associated to the type descriptor $1
-function fort_type {
-	echo -n "$(fort_ptype $1)"
-	if [ -n "$(fort_kind $1)$2" ]
+function zpp_fort_type {
+	echo -n "$(zpp_fort_ptype $1)"
+	if [ -n "$(zpp_fort_kind $1)$2" ]
 	then
 		echo -n "("
 	fi
-	if [ -n "$(fort_kind $1)" ]
+	if [ -n "$(zpp_fort_kind $1)" ]
 	then
-		echo -n "KIND=$(fort_kind $1)"
+		echo -n "KIND=$(zpp_fort_kind $1)"
 	fi
-	if [ -n "$(fort_kind $1)" -a -n "$2" ]
+	if [ -n "$(zpp_fort_kind $1)" -a -n "$2" ]
 	then
 		echo -n ","
 	fi
 	echo -n "$2"
-	if [ -n "$(fort_kind $1)$2" ]
+	if [ -n "$(zpp_fort_kind $1)$2" ]
 	then
 		echo -n ")"
 	fi
 }
 
 # Returns the size in bits of the Fortran type associated to the type descriptor $1
-function fort_sizeof {
-	KIND="$(fort_kind $1)"
+function zpp_fort_sizeof {
+	KIND="$(zpp_fort_kind $1)"
 	case "$1" in
 	CHARACTER*|INTEGER*|LOGICAL*|REAL*)
 		echo -n "$((KIND*8))"
@@ -77,12 +77,12 @@ function fort_sizeof {
 }
 
 # Returns an array descriptor for an assumed shape array of dimension $1
-function array_desc() {
-	str_repeat ':' 1 "$1" ',' '(' ')'
+function zpp_fort_array_desc() {
+	zpp_str_repeat ':' 1 "$1" ',' '(' ')'
 }
 
 # Returns a format descriptor for I/O associated to the one letter type descriptor $1
-function io_format {
+function zpp_fort_io_format {
 	case "$1" in
 	CHARACTER*)
 		echo -n "A30"

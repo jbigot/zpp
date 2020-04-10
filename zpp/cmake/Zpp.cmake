@@ -1,5 +1,5 @@
 ################################################################################
-# Copyright (c) 2013-2019, Julien Bigot - CEA (julien.bigot@cea.fr)
+# Copyright (c) Julien Bigot - CEA (julien.bigot@cea.fr)
 # All rights reserved.
 #
 # Permission is hereby granted, free of charge, to any person obtaining a copy
@@ -28,78 +28,78 @@ cmake_policy(PUSH)
 get_filename_component(_CURRENT_LIST_DIR "${CMAKE_CURRENT_LIST_FILE}" PATH)
 
 # Compute the installation prefix relative to this file.
-if(NOT DEFINED BPP_EXECUTABLE)
-	get_filename_component(_BPP_BIN_DIR "${CMAKE_CURRENT_LIST_FILE}" PATH)
-	get_filename_component(_BPP_BIN_DIR "${_BPP_BIN_DIR}" PATH)
-	get_filename_component(_BPP_BIN_DIR "${_BPP_BIN_DIR}" PATH)
-	get_filename_component(_BPP_BIN_DIR "${_BPP_BIN_DIR}" PATH)
-	if(_BPP_BIN_DIR STREQUAL "/")
-		set(_BPP_BIN_DIR "")
+if(NOT DEFINED ZPP_EXECUTABLE)
+	get_filename_component(_ZPP_BIN_DIR "${CMAKE_CURRENT_LIST_FILE}" PATH)
+	get_filename_component(_ZPP_BIN_DIR "${_ZPP_BIN_DIR}" PATH)
+	get_filename_component(_ZPP_BIN_DIR "${_ZPP_BIN_DIR}" PATH)
+	get_filename_component(_ZPP_BIN_DIR "${_ZPP_BIN_DIR}" PATH)
+	if(_ZPP_BIN_DIR STREQUAL "/")
+		set(_ZPP_BIN_DIR "")
 	endif()
-	set(BPP_EXECUTABLE "${_BPP_BIN_DIR}/bin/bpp")
+	set(ZPP_EXECUTABLE "${_ZPP_BIN_DIR}/bin/zpp")
 endif()
 
-# A function to generate the BPP config.bpp.sh file
-function(bpp_gen_config OUTFILE)
+# A function to generate the ZPP config.zpp.sh file
+function(zpp_gen_config OUTFILE)
 	include("${_CURRENT_LIST_DIR}/TestFortType.cmake")
 	foreach(TYPENAME "CHARACTER" "COMPLEX" "INTEGER" "LOGICAL" "REAL")
 		foreach(TYPESIZE 1 2 4 8 16 32 64)
-			test_fort_type("BPP_${TYPENAME}${TYPESIZE}_WORKS" "${TYPENAME}" "${TYPESIZE}")
-			if("${BPP_${TYPENAME}${TYPESIZE}_WORKS}")
-				set(BPP_FORTTYPES "${BPP_FORTTYPES}${TYPENAME}${TYPESIZE} ")
+			test_fort_type("ZPP_${TYPENAME}${TYPESIZE}_WORKS" "${TYPENAME}" "${TYPESIZE}")
+			if("${ZPP_${TYPENAME}${TYPESIZE}_WORKS}")
+				set(ZPP_FORT_TYPES "${ZPP_FORT_TYPES}${TYPENAME}${TYPESIZE} ")
 			endif()
 		endforeach()
 	endforeach()
 	if(NOT EXISTS "${OUTFILE}")
 		file(WRITE "${OUTFILE}"
 "# All types supported by the current Fortran implementation
-BPP_FORTTYPES=\"${BPP_FORTTYPES}\"
+ZPP_FORT_TYPES=\"${ZPP_FORT_TYPES}\"
 # for compatibility
-FORTTYPES=\"\${BPP_FORTTYPES}\"
+ZPP_FORT_TYPES=\"\${ZPP_FORT_TYPES}\"
 ")
 	endif()
 endfunction()
 
 
 
-# A function to preprocess a source file with BPP
-function(bpp_preprocess)
-	cmake_parse_arguments(BPP_PREPROCESS "" "OUTPUT" "DEFINES;INCLUDES;SOURCES" "${FIRST_SRC}" ${ARGN})
+# A function to preprocess a source file with ZPP
+function(zpp_preprocess)
+	cmake_parse_arguments(ZPP_PREPROCESS "" "OUTPUT" "DEFINES;INCLUDES;SOURCES" "${FIRST_SRC}" ${ARGN})
 
 	# old function signature for compatibility
 	if ( 
-			"${BPP_PREPROCESS_OUTPUT}" STREQUAL ""
-			AND "${BPP_PREPROCESS_DEFINES}" STREQUAL ""
-			AND "${BPP_PREPROCESS_INCLUDES}" STREQUAL ""
-			AND "${BPP_PREPROCESS_SOURCES}" STREQUAL ""
+			"${ZPP_PREPROCESS_OUTPUT}" STREQUAL ""
+			AND "${ZPP_PREPROCESS_DEFINES}" STREQUAL ""
+			AND "${ZPP_PREPROCESS_INCLUDES}" STREQUAL ""
+			AND "${ZPP_PREPROCESS_SOURCES}" STREQUAL ""
 	)
-		list(GET ARGV 0 BPP_PREPROCESS_OUTPUT)
+		list(GET ARGV 0 ZPP_PREPROCESS_OUTPUT)
 		list(REMOVE_AT ARGV 0)
-		set(BPP_PREPROCESS_SOURCES ${ARGV})
-	elseif(NOT "${BPP_PREPROCESS_UNPARSED_ARGUMENTS}" STREQUAL "")
-		message(SEND_ERROR "Unexpected argument(s) to bpp_preprocess: ${BPP_PREPROCESS_UNPARSED_ARGUMENTS}")
+		set(ZPP_PREPROCESS_SOURCES ${ARGV})
+	elseif(NOT "${ZPP_PREPROCESS_UNPARSED_ARGUMENTS}" STREQUAL "")
+		message(SEND_ERROR "Unexpected argument(s) to zpp_preprocess: ${ZPP_PREPROCESS_UNPARSED_ARGUMENTS}")
 	endif()
 	
-	unset(BPP_INCLUDE_PARAMS)
+	unset(ZPP_INCLUDE_PARAMS)
 
 	get_property(DIR_INCLUDE_DIRS DIRECTORY PROPERTY INCLUDE_DIRECTORIES)
-	foreach(INCLUDE_DIR ${DIR_INCLUDE_DIRS} ${BPP_PREPROCESS_INCLUDES})
-		set(BPP_INCLUDE_PARAMS ${BPP_INCLUDE_PARAMS} "-I" "${INCLUDE_DIR}")
+	foreach(INCLUDE_DIR ${DIR_INCLUDE_DIRS} ${ZPP_PREPROCESS_INCLUDES})
+		set(ZPP_INCLUDE_PARAMS ${ZPP_INCLUDE_PARAMS} "-I" "${INCLUDE_DIR}")
 	endforeach()
-	foreach(DEFINE ${BPP_PREPROCESS_DEFINES})
-		set(BPP_INCLUDE_PARAMS ${BPP_INCLUDE_PARAMS} "-D" "${DEFINE}")
+	foreach(DEFINE ${ZPP_PREPROCESS_DEFINES})
+		set(ZPP_INCLUDE_PARAMS ${ZPP_INCLUDE_PARAMS} "-D" "${DEFINE}")
 	endforeach()
 
-	bpp_gen_config("${CMAKE_CURRENT_BINARY_DIR}/bppconf/config.bpp.sh")
-	set(BPP_INCLUDE_PARAMS ${BPP_INCLUDE_PARAMS} "-I" "${CMAKE_CURRENT_BINARY_DIR}/bppconf")
+	zpp_gen_config("${CMAKE_CURRENT_BINARY_DIR}/zppconf/config.zpp.sh")
+	set(ZPP_INCLUDE_PARAMS ${ZPP_INCLUDE_PARAMS} "-I" "${CMAKE_CURRENT_BINARY_DIR}/zppconf")
 	
 	set(OUTFILES)
-	foreach(SRC ${BPP_PREPROCESS_SOURCES})
+	foreach(SRC ${ZPP_PREPROCESS_SOURCES})
 		get_filename_component(OUTFILE "${SRC}" NAME)
 		string(REGEX REPLACE "\\.[bB][pP][pP]$" "" OUTFILE "${OUTFILE}")
 		set(OUTFILE "${CMAKE_CURRENT_BINARY_DIR}/${OUTFILE}")
 		add_custom_command(OUTPUT "${OUTFILE}"
-			COMMAND "${BPP_EXECUTABLE}" ${BPP_INCLUDE_PARAMS} "${SRC}" "${OUTFILE}"
+			COMMAND "${ZPP_EXECUTABLE}" ${ZPP_INCLUDE_PARAMS} "${SRC}" "${OUTFILE}"
 			WORKING_DIRECTORY "${CMAKE_CURRENT_SOURCE_DIR}"
 			MAIN_DEPENDENCY "${SRC}"
 			VERBATIM
@@ -107,7 +107,7 @@ function(bpp_preprocess)
 		list(APPEND OUTFILES "${OUTFILE}")
 	endforeach()
 
-	set(${BPP_PREPROCESS_OUTPUT} "${OUTFILES}" PARENT_SCOPE)
+	set(${ZPP_PREPROCESS_OUTPUT} "${OUTFILES}" PARENT_SCOPE)
 endfunction()
 
 cmake_policy(POP)

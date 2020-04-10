@@ -1,5 +1,5 @@
 !-------------------------------------------------------------------------------
-! Copyright (c) 2013-2019, Julien Bigot - CEA (julien.bigot@cea.fr)
+! Copyright (c) Julien Bigot - CEA (julien.bigot@cea.fr)
 ! All rights reserved.
 !
 ! Permission is hereby granted, free of charge, to any person obtaining a copy
@@ -21,7 +21,7 @@
 ! THE SOFTWARE.
 !-------------------------------------------------------------------------------
 
-!$SH source fortran.bpp.sh
+!$SH source fortran.zpp.sh
 !$SH MAXDIM=7
 
 module print_mod
@@ -33,7 +33,7 @@ module print_mod
   public:: print_val
 
   interface print_val
-!$SH for T in ${FORTTYPES}; do # T: type descriptor
+!$SH for T in ${ZPP_FORT_TYPES}; do # T: type descriptor
 !$SH   for D in $(seq 0 ${MAXDIM}); do # D: dimensions of array
     module procedure print_${T}_${D}d
 !$SH   done
@@ -41,17 +41,17 @@ module print_mod
   endinterface print_val
 
 contains
-!$SH for T in ${FORTTYPES}; do # T: type descriptor
+!$SH for T in ${ZPP_FORT_TYPES}; do # T: type descriptor
 !$SH   for D in $(seq 0 ${MAXDIM}); do # D: dimensions of array
 
 
   subroutine print_${T}_${D}d( val )
 
-    $(fort_type $T):: val$(array_desc $D)
+    $(zpp_fort_type $T):: val$(zpp_fort_array_desc $D)
 
     print '("The value is a $T of dim $D")'
-    print '("Its first element is ", $(io_format $T) )', &
-            val$(str_repeat 1 1 $D ', ' '(' ')')
+    print '("Its first element is ", $(zpp_fort_io_format $T) )', &
+            val$(zpp_str_repeat 1 1 $D ', ' '(' ')')
 
   endsubroutine print_${T}_${D}d
 
@@ -59,7 +59,7 @@ contains
 !$SH done
 endmodule print_mod
 
-program tst_bpp
+program tst_zpp
 
   use print_mod
 
@@ -85,4 +85,4 @@ program tst_bpp
   call print_val(rval)
   call print_val(aval)
 
-endprogram tst_bpp
+endprogram tst_zpp
