@@ -42,6 +42,9 @@ if(NOT DEFINED ZPP_EXECUTABLE)
 	set(ZPP_EXECUTABLE "${_ZPP_BIN_DIR}/bin/zpp")
 endif()
 
+# For compatibility
+set(BPP_EXECUTABLE "${ZPP_EXECUTABLE}")
+
 include("${_CURRENT_LIST_DIR}/Zpp.cmake")
 
 cmake_policy(POP)

@@ -60,6 +60,11 @@ ZPP_FORT_TYPES=\"\${ZPP_FORT_TYPES}\"
 	endif()
 endfunction()
 
+# For compatibility
+macro(bpp_gen_config)
+	message(DEPRECATION "bpp_gen_config is deprecated, use zpp_gen_config instead")
+	zpp_gen_config(${ARGV})
+macro()
 
 
 # A function to preprocess a source file with ZPP
@@ -109,5 +114,11 @@ function(zpp_preprocess)
 
 	set(${ZPP_PREPROCESS_OUTPUT} "${OUTFILES}" PARENT_SCOPE)
 endfunction()
+
+# For compatibility
+macro(bpp_preprocess)
+	message(DEPRECATION "bpp_preprocess is deprecated, use zpp_preprocess instead")
+	zpp_preprocess(${ARGV})
+macro()
 
 cmake_policy(POP)

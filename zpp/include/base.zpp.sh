@@ -106,3 +106,13 @@ function zpp_str_repeat_reverse() {
   done
   echo "$RES"
 }
+
+if [ "x${ZPP_NO_COMPATIBILITY}" = "x" ]
+then
+function str_repeat() {
+	zpp_str_repeat "$@"
+}
+function str_repeat_reverse() {
+	zpp_str_repeat_reverse "$@"
+}
+fi

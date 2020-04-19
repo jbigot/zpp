@@ -40,7 +40,7 @@ def install_helpers_method(self):
     print("running install_wrappers")
     
     share_dir = join('share', self.config_vars["dist_name"])
-    cmake_dir = join(share_dir, 'cmake')
+    cmake_dirs = [ join(share_dir, 'cmake'), join('share', 'bpp', 'cmake') ]
     
     prefix = self.install_data
     
@@ -55,7 +55,7 @@ def install_helpers_method(self):
             cmake_registry_file = join(cmake_registry, self.config_vars["dist_fullname"])
             print("Writing cmake registry file: "+cmake_registry_file)
             with open(cmake_registry_file, 'w') as zppfile:
-                zppfile.write(join(self.install_userbase, cmake_dir)+"\n")
+                zppfile.write(join(self.install_userbase, cmake_dirs[0])+"\n")
         else:
             print("Not registering in cmake user registry: unsupported system type ("+system()+")")
     else:
@@ -63,7 +63,7 @@ def install_helpers_method(self):
             prefix = join(prefix, 'usr')
     
     share_dir = join(prefix, share_dir)
-    cmake_dir = join(prefix, cmake_dir)
+    cmake_dirs = map( lambda d: join(prefix, d), cmake_dirs)
     
     if not isdir(share_dir):
         makedirs(share_dir)
@@ -73,26 +73,27 @@ def install_helpers_method(self):
             print('Installing '+res_name+' wrapper to '+share_dir)
             copyfileobj(open(join('zpp', res_name), 'rb'), open(dst, 'wb'))
     
-    if not isdir(cmake_dir):
-        makedirs(cmake_dir)
-    rel_cmake_path = relpath(abspath(self.install_scripts), cmake_dir)
-    try:
-        rel_cmake_path = bytes(rel_cmake_path, encoding='utf8')
-    except:
-        rel_cmake_path = bytes(rel_cmake_path)
-    for res_name in listdir(join('zpp', 'cmake')):
-        dst = join(cmake_dir, res_name)
-        print('Installing '+res_name+' wrapper to '+cmake_dir)
-        data_in = open(join('zpp', 'cmake', res_name), 'rb')
-        with open(dst, 'wb') as data_out:
-            if res_name == 'ZppConfig.cmake':
-                for line in data_in:
-                    if bytes(b'@PYTHON_INSERT_ZPP_EXECUTABLE@') in line:
-                        data_out.write(bytes(b'get_filename_component(ZPP_EXECUTABLE "${_CURRENT_LIST_DIR}/'+rel_cmake_path+b'/zpp" ABSOLUTE)\n'))
-                    else:
-                        data_out.write(line)
-            else:
-                copyfileobj(data_in, data_out)
+    for cmake_dir in cmake_dirs:
+        if not isdir(cmake_dir):
+            makedirs(cmake_dir)
+        rel_cmake_path = relpath(abspath(self.install_scripts), cmake_dir)
+        try:
+            rel_cmake_path = bytes(rel_cmake_path, encoding='utf8')
+        except:
+            rel_cmake_path = bytes(rel_cmake_path)
+        for res_name in listdir(join('zpp', 'cmake')):
+            dst = join(cmake_dir, res_name)
+            print('Installing '+res_name+' wrapper to '+cmake_dir)
+            data_in = open(join('zpp', 'cmake', res_name), 'rb')
+            with open(dst, 'wb') as data_out:
+                if res_name == 'ZppConfig.cmake':
+                    for line in data_in:
+                        if bytes(b'@PYTHON_INSERT_ZPP_EXECUTABLE@') in line:
+                            data_out.write(bytes(b'get_filename_component(ZPP_EXECUTABLE "${_CURRENT_LIST_DIR}/'+rel_cmake_path+b'/zpp" ABSOLUTE)\n'))
+                        else:
+                            data_out.write(line)
+                else:
+                    copyfileobj(data_in, data_out)
     
 
 class PostDevelopCommand(develop):
@@ -114,7 +115,7 @@ with open("zpp/version.py") as fp:
 setup(
     packages = [ 'zpp' ],
     zip_safe = True,
-    entry_points = { "console_scripts": [ "zpp = zpp:main" ] },
+    entry_points = { "console_scripts": [ "zpp = zpp:main", "bpp = zpp:main" ] },
     package_data = { "zpp": ["include/*.zpp.sh"] },
     install_requires = [ 'setuptools' ],
     cmdclass = { 'develop': PostDevelopCommand, 'install': PostInstallCommand },

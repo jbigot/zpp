@@ -37,3 +37,11 @@ zpp_hdf5f_constant()
 		;;
 	esac
 }
+
+if [ "x${ZPP_NO_COMPATIBILITY}" = "x" ]
+then
+HDF5TYPES="${ZPP_HDF5F_TYPES}"
+function hdf5_constant() {
+	zpp_hdf5f_constant "$@"
+}
+fi

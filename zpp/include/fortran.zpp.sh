@@ -21,6 +21,11 @@
 # THE SOFTWARE.
 ################################################################################
 
+if [ "x${ZPP_NO_COMPATIBILITY}" = "x" ]
+then
+ZPP_FORT_FILE="${CONFIG_FILE}"
+fi
+
 # The list of types supported by the fortran compiler as zpp:typeIDs.
 ZPP_FORT_TYPES="CHARACTER1 COMPLEX4 COMPLEX8 INTEGER1 INTEGER2 INTEGER4 INTEGER8 LOGICAL1 REAL4 REAL8"
 
@@ -101,3 +106,27 @@ function zpp_fort_io_format {
 		;;
 	esac
 }
+
+if [ "x${ZPP_NO_COMPATIBILITY}" = "x" ]
+then
+FORTTYPES="${ZPP_FORT_TYPES}"
+BPP_FORTTYPES="${ZPP_FORT_TYPES}"
+function fort_kind() {
+	zpp_fort_kind "$@"
+}
+function fort_ptype() {
+	zpp_fort_ptype "$@"
+}
+function fort_type() {
+	zpp_fort_type "$@"
+}
+function fort_sizeof() {
+	zpp_fort_sizeof "$@"
+}
+function array_desc() {
+	zpp_fort_array_desc "$@"
+}
+function io_format() {
+	zpp_fort_io_format "$@"
+}
+fi
