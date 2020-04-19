@@ -64,7 +64,7 @@ endfunction()
 macro(bpp_gen_config)
 	message(DEPRECATION "bpp_gen_config is deprecated, use zpp_gen_config instead")
 	zpp_gen_config(${ARGV})
-macro()
+endmacro()
 
 
 # A function to preprocess a source file with ZPP
@@ -119,6 +119,6 @@ endfunction()
 macro(bpp_preprocess)
 	message(DEPRECATION "bpp_preprocess is deprecated, use zpp_preprocess instead")
 	zpp_preprocess(${ARGV})
-macro()
+endmacro()
 
 cmake_policy(POP)
