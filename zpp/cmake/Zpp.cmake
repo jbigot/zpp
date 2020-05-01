@@ -41,21 +41,20 @@ endif()
 
 # A function to generate the ZPP config.zpp.sh file
 function(zpp_gen_config OUTFILE)
-	include("${_CURRENT_LIST_DIR}/TestFortType.cmake")
-	foreach(TYPENAME "CHARACTER" "COMPLEX" "INTEGER" "LOGICAL" "REAL")
-		foreach(TYPESIZE 1 2 4 8 16 32 64)
-			test_fort_type("ZPP_${TYPENAME}${TYPESIZE}_WORKS" "${TYPENAME}" "${TYPESIZE}")
-			if("${ZPP_${TYPENAME}${TYPESIZE}_WORKS}")
-				set(ZPP_FORT_TYPES "${ZPP_FORT_TYPES}${TYPENAME}${TYPESIZE} ")
-			endif()
-		endforeach()
-	endforeach()
 	if(NOT EXISTS "${OUTFILE}")
+		include("${_CURRENT_LIST_DIR}/TestFortType.cmake")
+		set(ZPP_FORT_TYPES "")
+		foreach(TYPENAME "CHARACTER" "COMPLEX" "INTEGER" "LOGICAL" "REAL")
+			foreach(TYPESIZE 1 2 4 8 16 32 64)
+				test_fort_type("ZPP_${TYPENAME}${TYPESIZE}_WORKS" "${TYPENAME}" "${TYPESIZE}")
+				if("${ZPP_${TYPENAME}${TYPESIZE}_WORKS}")
+					set(ZPP_FORT_TYPES "${ZPP_FORT_TYPES}${TYPENAME}${TYPESIZE} ")
+				endif()
+			endforeach()
+		endforeach()
 		file(WRITE "${OUTFILE}"
 "# All types supported by the current Fortran implementation
 ZPP_FORT_TYPES=\"${ZPP_FORT_TYPES}\"
-# for compatibility
-ZPP_FORT_TYPES=\"\${ZPP_FORT_TYPES}\"
 ")
 	endif()
 endfunction()
