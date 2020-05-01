@@ -129,8 +129,8 @@ def setup_dir(includes):
                     src = abspath(join(incdir, incfile))
                     dst = join(tmpdir, basename(incfile))
                     if not exists(dst):
-                        symlink(src, dst[:-7]+'.zpp.sh')
-                        symlink(src, dst[:-7]+'.bpp.sh')
+                        symlink(src, abytes(dst[:-7])+b'.zpp.sh')
+                        symlink(src, abytes(dst[:-7])+b'.bpp.sh')
         else:
             print('Warning: include directory not found: "' +
                   incdir+'"', file=stderr)
@@ -140,7 +140,7 @@ def setup_dir(includes):
 def handle_file(tmpdir, input, defines, output):
     with open(join(tmpdir, basename(input)+'.bash'), 'wb') as tmpfile, open(input, 'rb') as infile:
         inbash = True
-        tmpfile.write('set -e\n')
+        tmpfile.write(b'set -e\n')
         for var in defines:
             tmpfile.write(abytes(var)+b'='+abytes(defines[var])+b"\n")
         for line in infile:
