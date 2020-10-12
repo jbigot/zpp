@@ -22,19 +22,18 @@
 ################################################################################
 
 # Compute the installation prefix relative to this file.
-get_filename_component(_ZPP_IMPORT_PREFIX "${CMAKE_CURRENT_LIST_FILE}" PATH)
-get_filename_component(_ZPP_IMPORT_PREFIX "${_ZPP_IMPORT_PREFIX}" PATH)
-get_filename_component(_ZPP_IMPORT_PREFIX "${_ZPP_IMPORT_PREFIX}" PATH)
-get_filename_component(_ZPP_IMPORT_PREFIX "${_ZPP_IMPORT_PREFIX}" PATH)
-if(_ZPP_IMPORT_PREFIX STREQUAL "/")
-	set(_ZPP_IMPORT_PREFIX "")
-endif()
+get_filename_component(_CURRENT_LIST_DIR "${CMAKE_CURRENT_LIST_FILE}" PATH)
+include("${_CURRENT_LIST_DIR}/ZppConfig.cmake")
 
-execute_process(COMMAND "${_ZPP_IMPORT_PREFIX}/bin/zpp" "--version"
+execute_process(COMMAND "${ZPP_EXECUTABLE}" "--version"
 	RESULT_VARIABLE _ZPP_VERSION_RESULT
 	OUTPUT_VARIABLE PACKAGE_VERSION
+	ERROR_VARIABLE _ZPP_VERSION_ERROR
 	OUTPUT_STRIP_TRAILING_WHITESPACE
 )
+if(NOT "0${_ZPP_VERSION_RESULT}" EQUAL 0)
+	message("${ZPP_EXECUTABLE} --version\n${PACKAGE_VERSION}\n${_ZPP_VERSION_ERROR}\n\$?=${_ZPP_VERSION_RESULT}")
+endif()
 
 # Check whether the requested PACKAGE_FIND_VERSION is compatible
 if("${PACKAGE_VERSION}" VERSION_LESS "${PACKAGE_FIND_VERSION}")

@@ -31,9 +31,8 @@ get_filename_component(_CURRENT_LIST_DIR "${CMAKE_CURRENT_LIST_FILE}" PATH)
 #@PYTHON_INSERT_ZPP_EXECUTABLE@
 
 # Compute the installation prefix relative to this file.
-if(NOT DEFINED ZPP_EXECUTABLE)
-	get_filename_component(_ZPP_BIN_DIR "${CMAKE_CURRENT_LIST_FILE}" PATH)
-	get_filename_component(_ZPP_BIN_DIR "${_ZPP_BIN_DIR}" PATH)
+if(NOT DEFINED "ZPP_EXECUTABLE")
+	get_filename_component(_ZPP_BIN_DIR "${_CURRENT_LIST_DIR}" PATH)
 	get_filename_component(_ZPP_BIN_DIR "${_ZPP_BIN_DIR}" PATH)
 	get_filename_component(_ZPP_BIN_DIR "${_ZPP_BIN_DIR}" PATH)
 	if(_ZPP_BIN_DIR STREQUAL "/")
