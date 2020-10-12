@@ -68,7 +68,11 @@ endmacro()
 
 # A function to preprocess a source file with ZPP
 function(zpp_preprocess)
-	cmake_parse_arguments(ZPP_PREPROCESS "" "OUTPUT" "DEFINES;INCLUDES;SOURCES" "${FIRST_SRC}" ${ARGN})
+	if("${CMAKE_VERSION}" VERSION_LESS "3.7")
+		cmake_parse_arguments(ZPP_PREPROCESS "" "OUTPUT" "DEFINES;INCLUDES;SOURCES" ${ARGV})
+	else()
+		cmake_parse_arguments(PARSE_ARGV 0 ZPP_PREPROCESS "" "OUTPUT" "DEFINES;INCLUDES;SOURCES")
+	endif()
 
 	# old function signature for compatibility
 	if ( 
