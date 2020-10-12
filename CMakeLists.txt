@@ -22,21 +22,20 @@
 
 cmake_minimum_required(VERSION 3.5)
 
-# Compute the installation prefix relative to this file.
-get_filename_component(_CURRENT_LIST_DIR "${CMAKE_CURRENT_LIST_FILE}" PATH)
+set(Python_ADDITIONAL_VERSIONS 3 2)
+find_package(PythonInterp REQUIRED)
 
 # if we are added by add_subdirectory(), behave as with find_package
 if(NOT "${CMAKE_CURRENT_SOURCE_DIR}" STREQUAL "${CMAKE_SOURCE_DIR}")
-	set(ZPP_EXECUTABLE "${_CURRENT_LIST_DIR}/bin/zpp")
-	include("${CMAKE_CURRENT_LIST_DIR}/zpp/cmake/Zpp.cmake")
+	configure_file(bin/zpp.in zpp @ONLY)
+	set(ZPP_EXECUTABLE "${CMAKE_CURRENT_BINARY_DIR}/zpp")
+	include("${CMAKE_CURRENT_SOURCE_DIR}/zpp/cmake/Zpp.cmake")
 	return()
 endif()
 
 # Behave as a wrapper for the setuptools installer
 
 project(Zpp NONE)
-
-find_package(PythonInterp REQUIRED)
 
 message(WARNING "The cmake build-system is a simple wrapper for the setup.py, it will be removed in future versions, please switch to a direct use of setup.py")
 
@@ -50,5 +49,6 @@ file(COPY
 	DESTINATION "${CMAKE_CURRENT_BINARY_DIR}/pypkg"
 	USE_SOURCE_PERMISSIONS)
 
-install(CODE "execute_process(COMMAND \"${PYTHON_EXECUTABLE}\" setup.py install --prefix \"${CMAKE_INSTALL_PREFIX}\"
-WORKING_DIRECTORY \"${CMAKE_CURRENT_BINARY_DIR}/pypkg\")")
+install(CODE "execute_process(
+		COMMAND [===[${PYTHON_EXECUTABLE}]===] setup.py install --prefix [===[${CMAKE_STAGING_PREFIX}]===]
+		WORKING_DIRECTORY [===[${CMAKE_CURRENT_BINARY_DIR}/pypkg]===])")
