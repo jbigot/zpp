@@ -103,10 +103,10 @@ function(zpp_preprocess)
 	set(OUTFILES)
 	foreach(SRC ${ZPP_PREPROCESS_SOURCES})
 		get_filename_component(OUTFILE "${SRC}" NAME)
-		string(REGEX REPLACE "\\.[bB][pP][pP]$" "" OUTFILE "${OUTFILE}")
+		string(REGEX REPLACE "\\.[bBzZ][pP][pP]$" "" OUTFILE "${OUTFILE}")
 		set(OUTFILE "${CMAKE_CURRENT_BINARY_DIR}/${OUTFILE}")
 		add_custom_command(OUTPUT "${OUTFILE}"
-			COMMAND "${ZPP_EXECUTABLE}" ${ZPP_INCLUDE_PARAMS} "${SRC}" "${OUTFILE}"
+			COMMAND "${ZPP_EXECUTABLE}" -o "${OUTFILE}" ${ZPP_INCLUDE_PARAMS} "${SRC}"
 			WORKING_DIRECTORY "${CMAKE_CURRENT_SOURCE_DIR}"
 			MAIN_DEPENDENCY "${SRC}"
 			VERBATIM
