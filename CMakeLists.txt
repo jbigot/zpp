@@ -28,7 +28,7 @@ find_package(PythonInterp REQUIRED)
 # if we are added by add_subdirectory(), behave as with find_package
 if(NOT "${CMAKE_CURRENT_SOURCE_DIR}" STREQUAL "${CMAKE_SOURCE_DIR}")
 	configure_file(bin/zpp.in zpp @ONLY)
-	set(ZPP_EXECUTABLE "${CMAKE_CURRENT_BINARY_DIR}/zpp")
+	set(ZPP_EXECUTABLE "${CMAKE_CURRENT_BINARY_DIR}/zpp" PARENT_SCOPE)
 	include("${CMAKE_CURRENT_SOURCE_DIR}/zpp/cmake/Zpp.cmake")
 	return()
 endif()

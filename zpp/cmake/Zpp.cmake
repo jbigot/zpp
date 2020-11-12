@@ -26,22 +26,13 @@ cmake_policy(PUSH)
 
 # Compute the installation prefix relative to this file.
 get_filename_component(_CURRENT_LIST_DIR "${CMAKE_CURRENT_LIST_FILE}" PATH)
-
-# Compute the installation prefix relative to this file.
-if(NOT DEFINED ZPP_EXECUTABLE)
-	get_filename_component(_ZPP_BIN_DIR "${_CURRENT_LIST_DIR}" PATH)
-	get_filename_component(_ZPP_BIN_DIR "${_ZPP_BIN_DIR}" PATH)
-	get_filename_component(_ZPP_BIN_DIR "${_ZPP_BIN_DIR}" PATH)
-	if(_ZPP_BIN_DIR STREQUAL "/")
-		set(_ZPP_BIN_DIR "")
-	endif()
-	set(ZPP_EXECUTABLE "${_ZPP_BIN_DIR}/bin/zpp")
-endif()
+set(ZPP_CMAKE_DIR "${_CURRENT_LIST_DIR}" CACHE PATH "Path to ZPP path")
+mark_as_advanced(ZPP_CMAKE_DIR)
 
 # A function to generate the ZPP config.zpp.sh file
 function(zpp_gen_config OUTFILE)
 	if(NOT EXISTS "${OUTFILE}")
-		include("${_CURRENT_LIST_DIR}/TestFortType.cmake")
+		include("${ZPP_CMAKE_DIR}/TestFortType.cmake")
 		set(ZPP_FORT_TYPES "")
 		foreach(TYPENAME "CHARACTER" "COMPLEX" "INTEGER" "LOGICAL" "REAL")
 			foreach(TYPESIZE 1 2 4 8 16 32 64)
@@ -99,6 +90,17 @@ function(zpp_preprocess)
 
 	zpp_gen_config("${CMAKE_CURRENT_BINARY_DIR}/zppconf/config.zpp.sh")
 	set(ZPP_INCLUDE_PARAMS ${ZPP_INCLUDE_PARAMS} "-I" "${CMAKE_CURRENT_BINARY_DIR}/zppconf")
+
+	# Compute the installation prefix relative to this file.
+	if(NOT DEFINED ZPP_EXECUTABLE)
+		get_filename_component(_ZPP_BIN_DIR "${ZPP_CMAKE_DIR}" PATH)
+		get_filename_component(_ZPP_BIN_DIR "${_ZPP_BIN_DIR}" PATH)
+		get_filename_component(_ZPP_BIN_DIR "${_ZPP_BIN_DIR}" PATH)
+		if(_ZPP_BIN_DIR STREQUAL "/")
+			set(_ZPP_BIN_DIR "")
+		endif()
+		set(ZPP_EXECUTABLE "${_ZPP_BIN_DIR}/bin/zpp")
+	endif()
 	
 	set(OUTFILES)
 	foreach(SRC ${ZPP_PREPROCESS_SOURCES})
