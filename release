@@ -9,11 +9,11 @@ fi
 
 export VERSION="$1"
 
-sed "s/__version__\s*=.*/__version__ = '${VERSION}'/' -i zpp/version.py
+sed "s/__version__\s*=.*/__version__ = '${VERSION}'/" -i zpp/version.py
 git commit -a
 git push
 git tag -sm "Zpp release ${VERSION}" "${VERSION}"
 git push --tags
 rm -R dist
 python3 -B setup.py sdist
-python3 -m twine upload dist/*
+python3 -m twine upload -s dist/*
