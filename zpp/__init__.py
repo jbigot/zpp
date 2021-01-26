@@ -32,7 +32,8 @@ except ImportError:
 from fileinput import FileInput
 from optparse import OptionParser
 from os import listdir, makedirs, symlink, unlink
-from os.path import abspath, basename, dirname, exists, expanduser, isdir, join, relpath, samefile, splitext
+from os.path import abspath, basename, dirname, exists, expanduser, isdir, join, relpath, samefile
+from os.path import splitext
 from platform import system
 from re import compile
 from shutil import copyfileobj, rmtree
@@ -53,7 +54,7 @@ def abytes(var):
 
 
 EOCAT = b'EOCAT_' + abytes(str(uuid4())).replace(b'-', b'_')
-TRIGGER_REGEX = compile(b'^\s*!\$SH\s+')
+TRIGGER_REGEX = compile(rb'^\s*!\$SH\s+')
 
 
 def parse_cmdline():
@@ -61,8 +62,10 @@ def parse_cmdline():
         (optname, _, valval) = value.partition('=')
         parser.values.defines[optname.strip()] = valval.strip()
 
-    parser = OptionParser(description="Preprocesses BASH in-line commands in a source file", version=__version__,
-                          usage="%prog [Options...] <source> [<destination>]\n  use `%prog -h' for more info")
+    parser = OptionParser(
+        description="Preprocesses BASH in-line commands in a source file",
+        version=__version__,
+        usage="%prog [Options...] <source> [<destination>]\n  use `%prog -h' for more info")
     parser.add_option('-I',
                       action='append',
                       dest='includes',
@@ -104,24 +107,33 @@ def parse_cmdline():
         if ext.lower() == '.zpp':
             output = root
         else:
-            output = input+'.unzpp'
+            output = input + '.unzpp'
     return (input, output, opts.includes, opts.defines)
 
 
 def setup_dir(includes):
     tmpdir = mkdtemp(suffix='', prefix='zpp.tmp.')
-    from pkg_resources import Requirement, resource_listdir, resource_stream, DistributionNotFound
-    from pkg_resources import VersionConflict
+    run_in_dir = False
     try:
-        for res_name in resource_listdir(Requirement.parse('zpp=='+__version__), 'zpp/include'):
-            copyfileobj(resource_stream(Requirement.parse('zpp=='+__version__),
-                                        join('zpp/include', res_name)), open(join(tmpdir, res_name), 'wb'))
-            symlink(join(tmpdir, res_name), join(tmpdir, res_name)[:-7]+'.bpp.sh')
-    except (DistributionNotFound, VersionConflict):
+        from pkg_resources import Requirement, resource_listdir, resource_stream
+        from pkg_resources import DistributionNotFound, VersionConflict
+        try:
+            for res_name in resource_listdir(
+                    Requirement.parse('zpp==' + __version__),
+                    'zpp/include'):
+                copyfileobj(resource_stream(Requirement.parse('zpp==' + __version__),
+                                            join('zpp/include', res_name)),
+                            open(join(tmpdir, res_name), 'wb'))
+                symlink(join(tmpdir, res_name), join(tmpdir, res_name)[:-7] + '.bpp.sh')
+        except (DistributionNotFound, VersionConflict):
+            run_in_dir = True
+    except ImportError:
+        run_in_dir = True
+    if run_in_dir:
         for res_name in listdir(join(abspath(dirname(__file__)), 'include')):
             copyfileobj(open(join(abspath(dirname(__file__)), 'include',
                                   res_name), 'rb'), open(join(tmpdir, res_name), 'wb'))
-            symlink(join(tmpdir, res_name), join(tmpdir, res_name)[:-7]+'.bpp.sh')
+            symlink(join(tmpdir, res_name), join(tmpdir, res_name)[:-7] + '.bpp.sh')
 
     for incdir in includes:
         if isdir(incdir):
@@ -130,33 +142,34 @@ def setup_dir(includes):
                     src = abspath(join(incdir, incfile))
                     dst = join(tmpdir, basename(incfile))
                     if not exists(dst):
-                        symlink(src, abytes(dst[:-7])+b'.zpp.sh')
-                        symlink(src, abytes(dst[:-7])+b'.bpp.sh')
+                        symlink(src, abytes(dst[:-7]) + b'.zpp.sh')
+                        symlink(src, abytes(dst[:-7]) + b'.bpp.sh')
         else:
             print('Warning: include directory not found: "' +
-                  incdir+'"', file=stderr)
+                  incdir + '"', file=stderr)
     return tmpdir
 
 
 def handle_file(tmpdir, input, defines, output):
-    with open(join(tmpdir, basename(input)+'.bash'), 'wb') as tmpfile, open(input, 'rb') as infile:
+    tmpfile_name = join(tmpdir, basename(input) + '.bash')
+    with open(tmpfile_name, 'wb') as tmpfile, open(input, 'rb') as infile:
         inbash = True
         tmpfile.write(b'set -e\n')
         for var in defines:
-            tmpfile.write(abytes(var)+b'='+abytes(defines[var])+b"\n")
+            tmpfile.write(abytes(var) + b'=' + abytes(defines[var]) + b"\n")
         for line in infile:
             if TRIGGER_REGEX.match(line):
                 if not inbash:
-                    tmpfile.write(EOCAT+b"\n")
+                    tmpfile.write(EOCAT + b"\n")
                     inbash = True
                 tmpfile.write(TRIGGER_REGEX.sub(b'', line, 1))
             else:
                 if inbash:
-                    tmpfile.write(b"cat<<"+EOCAT+b"\n")
+                    tmpfile.write(b"cat<<" + EOCAT + b"\n")
                     inbash = False
                 tmpfile.write(line)
         if not inbash:
-            tmpfile.write(EOCAT+b"\n")
+            tmpfile.write(EOCAT + b"\n")
         tmpfile.close()
 
         if output == '-':
