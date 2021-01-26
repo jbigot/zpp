@@ -14,9 +14,9 @@ then
 	export VERSION="$(grep __version__ zpp/version.py | sed -e "s/.*=\s*'//" -e "s/'\s*$//")"
 fi
 
-git commit -a || true
+git commit -a
 git tag -sm "Zpp release ${VERSION}" "${VERSION}"
-rm -R dist
+rm -R dist || true
 python3 -B setup.py sdist
 
 git push
