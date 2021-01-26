@@ -111,12 +111,13 @@ def parse_cmdline():
 def setup_dir(includes):
     tmpdir = mkdtemp(suffix='', prefix='zpp.tmp.')
     from pkg_resources import Requirement, resource_listdir, resource_stream, DistributionNotFound
+    from pkg_resources import VersionConflict
     try:
         for res_name in resource_listdir(Requirement.parse('zpp=='+__version__), 'zpp/include'):
             copyfileobj(resource_stream(Requirement.parse('zpp=='+__version__),
                                         join('zpp/include', res_name)), open(join(tmpdir, res_name), 'wb'))
             symlink(join(tmpdir, res_name), join(tmpdir, res_name)[:-7]+'.bpp.sh')
-    except DistributionNotFound:
+    except (DistributionNotFound, VersionConflict):
         for res_name in listdir(join(abspath(dirname(__file__)), 'include')):
             copyfileobj(open(join(abspath(dirname(__file__)), 'include',
                                   res_name), 'rb'), open(join(tmpdir, res_name), 'wb'))
