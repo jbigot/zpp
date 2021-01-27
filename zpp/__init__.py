@@ -54,7 +54,7 @@ def abytes(var):
 
 
 EOCAT = b'EOCAT_' + abytes(str(uuid4())).replace(b'-', b'_')
-TRIGGER_REGEX = compile(rb'^\s*!\$SH\s+')
+TRIGGER_REGEX = compile(br'^\s*!\$SH\s+')
 
 
 def parse_cmdline():
