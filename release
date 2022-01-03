@@ -16,7 +16,7 @@ fi
 
 git commit -a
 git tag -sm "Zpp release ${VERSION}" "${VERSION}"
-rm -R dist || true
+rm -Rf dist || true
 python3 -B setup.py sdist
 
 git push

@@ -21,7 +21,7 @@
 # THE SOFTWARE.
 ################################################################################
 
-cmake_minimum_required(VERSION 2.8)
+cmake_minimum_required(VERSION 3.0)
 project(ZppExample Fortran)
 
 add_subdirectory(../../ zpp EXCLUDE_FROM_ALL)
