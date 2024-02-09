@@ -1,34 +1,16 @@
-################################################################################
-# Copyright (c) Julien Bigot - CEA (julien.bigot@cea.fr)
-# All rights reserved.
+##############################################################################
+# SPDX-FileCopyrightText: 2014-2024 Centre national de la recherche scientifique (CNRS)
+# SPDX-FileCopyrightText: 2014-2024 Commissariat a l'énergie atomique et aux énergies alternatives (CEA)
+# SPDX-FileCopyrightText: 2014-2024 Julien Bigot <julien.bigot@cea.fr>
+# SPDX-FileCopyrightText: 2014-2024 Université Paris-Saclay
+# SPDX-FileCopyrightText: 2014-2024 Université de Versailles Saint-Quentin-en-Yvelines
 #
-# Permission is hereby granted, free of charge, to any person obtaining a copy
-# of this software and associated documentation files (the "Software"), to deal
-# in the Software without restriction, including without limitation the rights
-# to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
-# copies of the Software, and to permit persons to whom the Software is
-# furnished to do so, subject to the following conditions:
-#
-# The above copyright notice and this permission notice shall be included in
-# all copies or substantial portions of the Software.
-#
-# THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
-# IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
-# FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
-# AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
-# LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
-# OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
-# THE SOFTWARE.
-################################################################################
+# SPDX-License-Identifier: MIT
+##############################################################################
 
 """ The Bash PreProcessor
 """
 
-from __future__ import print_function
-try:
-    from builtins import bytes
-except ImportError:
-    from __builtin__ import bytes
 from fileinput import FileInput
 from optparse import OptionParser
 from os import listdir, makedirs, symlink, unlink
@@ -41,19 +23,12 @@ from site import getuserbase, getusersitepackages
 from subprocess import call
 from sys import argv, exit, stderr
 from tempfile import NamedTemporaryFile, mkdtemp
+from traceback import format_exc
 from uuid import uuid4
-
 from .version import __version__
 
 
-def abytes(var):
-    try:
-        return bytes(var, 'ASCII')
-    except TypeError:
-        return bytes(var)
-
-
-EOCAT = b'EOCAT_' + abytes(str(uuid4())).replace(b'-', b'_')
+EOCAT = b'EOCAT_' + bytes(str(uuid4()), 'ASCII').replace(b'-', b'_')
 TRIGGER_REGEX = compile(br'^\s*!\$SH\s+')
 
 
@@ -77,6 +52,11 @@ def parse_cmdline():
     parser.add_option('-o',
                       dest='output',
                       metavar="FILE",
+                      help='Place the preprocessed code in file FILE.'
+                      )
+    parser.add_option('-v', '--verbose',
+                      action='store_true',
+                      dest='verbose',
                       help='Place the preprocessed code in file FILE.'
                       )
     parser.add_option('-D',
@@ -108,7 +88,7 @@ def parse_cmdline():
             output = root
         else:
             output = input + '.unzpp'
-    return (input, output, opts.includes, opts.defines)
+    return (input, output, opts.includes, opts.defines, opts.verbose)
 
 
 def setup_dir(includes):
@@ -124,7 +104,6 @@ def setup_dir(includes):
                 copyfileobj(resource_stream(Requirement.parse('zpp==' + __version__),
                                             join('zpp/include', res_name)),
                             open(join(tmpdir, res_name), 'wb'))
-                symlink(join(tmpdir, res_name), join(tmpdir, res_name)[:-7] + '.bpp.sh')
         except (DistributionNotFound, VersionConflict):
             run_in_dir = True
     except ImportError:
@@ -133,17 +112,15 @@ def setup_dir(includes):
         for res_name in listdir(join(abspath(dirname(__file__)), 'include')):
             copyfileobj(open(join(abspath(dirname(__file__)), 'include',
                                   res_name), 'rb'), open(join(tmpdir, res_name), 'wb'))
-            symlink(join(tmpdir, res_name), join(tmpdir, res_name)[:-7] + '.bpp.sh')
 
     for incdir in includes:
         if isdir(incdir):
             for incfile in listdir(incdir):
-                if incfile[-7:] == '.zpp.sh' or incfile[-7:] == '.bpp.sh':
+                if incfile[-7:] == '.zpp.sh':
                     src = abspath(join(incdir, incfile))
                     dst = join(tmpdir, basename(incfile))
                     if not exists(dst):
-                        symlink(src, abytes(dst[:-7]) + b'.zpp.sh')
-                        symlink(src, abytes(dst[:-7]) + b'.bpp.sh')
+                        symlink(src, dst)
         else:
             print('Warning: include directory not found: "' +
                   incdir + '"', file=stderr)
@@ -156,7 +133,7 @@ def handle_file(tmpdir, input, defines, output):
         inbash = True
         tmpfile.write(b'set -e\n')
         for var in defines:
-            tmpfile.write(abytes(var) + b'=' + abytes(defines[var]) + b"\n")
+            tmpfile.write(var + '=' + defines[var] + "\n")
         for line in infile:
             if TRIGGER_REGEX.match(line):
                 if not inbash:
@@ -182,12 +159,16 @@ def handle_file(tmpdir, input, defines, output):
 
 def main():
     result = 0
-    (input, output, includes, defines) = parse_cmdline()
+    (input, output, includes, defines, verbose) = parse_cmdline()
     tmpdir = setup_dir(includes)
     try:
+        print(str(tmpdir), str(input), str(defines), str(output))
         handle_file(tmpdir, input, defines, output)
     except Exception as e:
         print(e, file=stderr)
+        if verbose:
+            print(str(e),format_exc(e), file=stderr)
         result = -1
-    rmtree(tmpdir)
+    finally:
+        rmtree(tmpdir)
     exit(result)

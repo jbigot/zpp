@@ -1,4 +1,14 @@
 #!/bin/bash
+##############################################################################
+# SPDX-FileCopyrightText: 2014-2024 Centre national de la recherche scientifique (CNRS)
+# SPDX-FileCopyrightText: 2014-2024 Commissariat a l'énergie atomique et aux énergies alternatives (CEA)
+# SPDX-FileCopyrightText: 2014-2024 Julien Bigot <julien.bigot@cea.fr>
+# SPDX-FileCopyrightText: 2014-2024 Université Paris-Saclay
+# SPDX-FileCopyrightText: 2014-2024 Université de Versailles Saint-Quentin-en-Yvelines
+#
+# SPDX-License-Identifier: MIT
+##############################################################################
+
 set -xe
 
 if [ $# -gt 1 ]
@@ -17,7 +27,7 @@ fi
 git commit -a
 git tag -sm "Zpp release ${VERSION}" "${VERSION}"
 rm -Rf dist || true
-python3 -B setup.py sdist
+python3 -m build
 
 git push
 git push --tags
